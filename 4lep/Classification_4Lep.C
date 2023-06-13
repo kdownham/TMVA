@@ -37,8 +37,21 @@ int Classification_4Lep(){
     std::map<std::string,int> Use;
 
     // Boosted decision trees
-    Use["BDT"]             = 1; // uses Adaptive Boost
-    Use["BDTG"]		   = 1; // uses Gradient Boost
+    Use["BDT"]             = 1; // uses Adaptive Boost (default values for all parameters)
+    //Use["BDT_opt"]         = 1; // uses Adaptive Boost (optimal values for all parameters)
+    Use["BDT_T200"]        = 1; // uses Adaptive Boost (200 trees, default depth, node size, learning rate)
+    Use["BDT_T400"]        = 1; // uses Adaptive Boost (400 trees, default depth, node size, learning rate)
+    //Use["BDT_T800"]        = 1; // uses Adaptive Boost (800 trees, default depth, node size, learning rate)
+    Use["BDT_D2"]          = 1; // uses Adaptive Boost (Tree depth = 2, default N_trees, node size, learning rate)
+    //Use["BDT_D3"]          = 1; // uses Adaptive Boost (Tree depth = 3, default N_trees, node size, learning rate)
+    Use["BDT_D4"]          = 1; // uses Adaptive Boost (Tree depth = 4, default N_trees, node size, learning rate)
+    Use["BDT_NS2p5"]       = 1; // uses Adaptive Boost (Max node size = 2.5%, default N_trees, depth, learning rate)
+    //Use["BDT_NS5"]         = 1; // uses Adaptive Boost (Max node size = 5%, default N_trees, depth, learning rate)
+    Use["BDT_NS10"]        = 1; // uses Adaptive Boost (Max node size = 10%, default N_trees, depth, learning rate)
+    Use["BDT_L3"]          = 1; // uses Adaptive Boost (Learning rate = 0.3, default N_trees, node size, depth)
+    //Use["BDT_L5"]          = 1; // uses Adaptive Boost (Learning rate = 0.5, default N_trees, node size, depth)
+    Use["BDT_L7"]          = 1; // uses Adaptive Boost (Learning rate = 0.7, default N_trees, node size, depth)
+    //Use["BDTG"]		   = 0; // uses Gradient Boost
     // TODO: create other BDT options with different hyperparameter options
     //=====================================================================
     // 
@@ -135,6 +148,7 @@ int Classification_4Lep(){
     dataloader->AddVariable("subleading_Wcand_pt", "p_{T}^{W2}", "GeV", 'F');
     dataloader->AddVariable("SFChannel", "Same Flavor Channel" , "", 'B');
     dataloader->AddVariable("OFChannel", "Opposite Flavor Channel", "", 'B');
+    dataloader->AddSpectator("CutBVeto", "Passes B Veto Cut", "", 'B');
 
     Double_t signalWeight = 1.0;
     Double_t ZZWeight = 1.0;
@@ -168,7 +182,7 @@ int Classification_4Lep(){
     dataloader->SetBackgroundWeightExpression("scaleLumi*intLumi");
 
     // Apply additional cuts on the signal and background samples (can be different)
-    TCut cut_all = "m_ll > -999 && dPhi_4Lep_MET > -999 && dPhi_Zcand_MET > -999 && dR_Wcands > -999 && dR_Zcands > -999 && MET > -999 && MT2 > -999 && Pt4l > -999 && STLepHad > -999 && leading_Zcand_pt > -999 && subleading_Zcand_pt > -999 && leading_Wcand_pt > -999 && subleading_Wcand_pt > -999";
+    TCut cut_all = "CutBVeto == 1 && m_ll > -999 && dPhi_4Lep_MET > -999 && dPhi_Zcand_MET > -999 && dR_Wcands > -999 && dR_Zcands > -999 && MET > -999 && MT2 > -999 && Pt4l > -999 && STLepHad > -999 && leading_Zcand_pt > -999 && subleading_Zcand_pt > -999 && leading_Wcand_pt > -999 && subleading_Wcand_pt > -999";
     
     // Book MVA methods
     //================================================================================
@@ -177,16 +191,48 @@ int Classification_4Lep(){
     //	    NormMode=EqualNumEvents - All classes have same # of effective events
     //================================================================================
     dataloader->PrepareTrainingAndTestTree( cut_all, cut_all,
-					  "nTrain_Signal=900000:nTrain_Background=3100000:SplitMode=Random:NormMode=NumEvents:!V" );
+					  "nTrain_Signal=700000:nTrain_Background=2500000:SplitMode=Random:NormMode=NumEvents:!V" );
 
     // Boosted Decision Trees (BDTs)
     if (Use["BDT"]) // Adaptive Boost
 	factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDT",
-                           "!H:!V:NTrees=200:MinNodeSize=2.5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:UseBaggedBoost:BaggedSampleFraction=0.5:SeparationType=GiniIndex:nCuts=20" );
+                           "!H:!V:NTrees=800:MinNodeSize=5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:UseBaggedBoost:BaggedSampleFraction=0.5:SeparationType=GiniIndex:nCuts=20" );
 
-    if (Use["BDTG"]) // Gradient Boost
-        factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDTG",
-                           "!H:!V:NTrees=200:MinNodeSize=2.5%:BoostType=Grad:Shrinkage=0.10:UseBaggedBoost:BaggedSampleFraction=0.5:nCuts=20:MaxDepth=3" );
+    if (Use["BDT_T200"])
+	factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDT_T200",
+                           "!H:!V:NTrees=200:MinNodeSize=5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:UseBaggedBoost:BaggedSampleFraction=0.5:SeparationType=GiniIndex:nCuts=20" );
+
+    if (Use["BDT_T400"])
+        factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDT_T400",
+                           "!H:!V:NTrees=400:MinNodeSize=5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:UseBaggedBoost:BaggedSampleFraction=0.5:SeparationType=GiniIndex:nCuts=20" );
+
+    if (Use["BDT_D2"])
+        factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDT_D2",
+                           "!H:!V:NTrees=800:MinNodeSize=5%:MaxDepth=2:BoostType=AdaBoost:AdaBoostBeta=0.5:UseBaggedBoost:BaggedSampleFraction=0.5:SeparationType=GiniIndex:nCuts=20" );
+
+    if (Use["BDT_D4"])
+        factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDT_D4",
+                           "!H:!V:NTrees=800:MinNodeSize=5%:MaxDepth=4:BoostType=AdaBoost:AdaBoostBeta=0.5:UseBaggedBoost:BaggedSampleFraction=0.5:SeparationType=GiniIndex:nCuts=20" );
+
+    if (Use["BDT_NS2p5"])
+        factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDT_NS2p5",
+                           "!H:!V:NTrees=800:MinNodeSize=2.5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:UseBaggedBoost:BaggedSampleFraction=0.5:SeparationType=GiniIndex:nCuts=20" );
+   
+    if (Use["BDT_NS10"])
+        factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDT_NS10",
+                           "!H:!V:NTrees=800:MinNodeSize=10%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:UseBaggedBoost:BaggedSampleFraction=0.5:SeparationType=GiniIndex:nCuts=20" );
+
+    if (Use["BDT_L3"])
+        factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDT_L3",
+                           "!H:!V:NTrees=800:MinNodeSize=5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.3:UseBaggedBoost:BaggedSampleFraction=0.5:SeparationType=GiniIndex:nCuts=20" );
+
+    if (Use["BDT_L7"])
+        factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDT_L7",
+                           "!H:!V:NTrees=800:MinNodeSize=5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.7:UseBaggedBoost:BaggedSampleFraction=0.5:SeparationType=GiniIndex:nCuts=20" );
+
+    //if (Use["BDTG"]) // Gradient Boost
+    //    factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDTG",
+    //                       "!H:!V:NTrees=200:MinNodeSize=2.5%:BoostType=Grad:Shrinkage=0.10:UseBaggedBoost:BaggedSampleFraction=0.5:nCuts=20:MaxDepth=3" );
 
     // Now I can tell the factory to train, test, and evaluate all MVA methods
     factory->TrainAllMethods();
