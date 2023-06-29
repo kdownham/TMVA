@@ -117,7 +117,7 @@ int Classification_4Lep(){
     TTree *OtherTree = (TTree*)input_Other->Get("t_BDT");
 
     // Create a ROOT output file where TMVA will store ntuples, histograms, etc.
-    TString outputName("WWZ_Backgrounds_4Lep.root");
+    TString outputName("WWZ_Backgrounds_4Lep_062823.root");
     TFile* outputFile = TFile::Open(outputName,"RECREATE");
 
     // Create the TMVA factory object
@@ -146,9 +146,9 @@ int Classification_4Lep(){
     dataloader->AddVariable("subleading_Zcand_pt", "p_{T}^{Z2}", "GeV", 'F');
     dataloader->AddVariable("leading_Wcand_pt", "p_{T}^{W1}", "GeV", 'F');
     dataloader->AddVariable("subleading_Wcand_pt", "p_{T}^{W2}", "GeV", 'F');
-    dataloader->AddVariable("SFChannel", "Same Flavor Channel" , "", 'B');
-    dataloader->AddVariable("OFChannel", "Opposite Flavor Channel", "", 'B');
-    dataloader->AddSpectator("CutBVeto", "Passes B Veto Cut", "", 'B');
+    dataloader->AddVariable("SFChannel", "Same Flavor Channel" , "", 'I');
+    dataloader->AddVariable("OFChannel", "Opposite Flavor Channel", "", 'I');
+    dataloader->AddSpectator("CutBVeto", "Passes B Veto Cut", "", 'I');
 
     Double_t signalWeight = 1.0;
     Double_t ZZWeight = 1.0;
@@ -191,44 +191,44 @@ int Classification_4Lep(){
     //	    NormMode=EqualNumEvents - All classes have same # of effective events
     //================================================================================
     dataloader->PrepareTrainingAndTestTree( cut_all, cut_all,
-					  "nTrain_Signal=700000:nTrain_Background=2500000:SplitMode=Random:NormMode=NumEvents:!V" );
+					  "nTrain_Signal=0:nTest_Signal=0:nTrain_Background=0:nTest_Background=0:SplitMode=Alternate:NormMode=NumEvents:!V" );
 
     // Boosted Decision Trees (BDTs)
     if (Use["BDT"]) // Adaptive Boost
 	factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDT",
-                           "!H:!V:NTrees=800:MinNodeSize=5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:UseBaggedBoost:BaggedSampleFraction=0.5:SeparationType=GiniIndex:nCuts=20" );
+                           "!H:!V:NTrees=800:MinNodeSize=5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:UseBaggedBoost:BaggedSampleFraction=0.5:SeparationType=SDivSqrtSPlusB:nCuts=20" );
 
     if (Use["BDT_T200"])
 	factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDT_T200",
-                           "!H:!V:NTrees=200:MinNodeSize=5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:UseBaggedBoost:BaggedSampleFraction=0.5:SeparationType=GiniIndex:nCuts=20" );
+                           "!H:!V:NTrees=200:MinNodeSize=5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:UseBaggedBoost:BaggedSampleFraction=0.5:SeparationType=SDivSqrtSPlusB:nCuts=20" );
 
     if (Use["BDT_T400"])
         factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDT_T400",
-                           "!H:!V:NTrees=400:MinNodeSize=5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:UseBaggedBoost:BaggedSampleFraction=0.5:SeparationType=GiniIndex:nCuts=20" );
+                           "!H:!V:NTrees=400:MinNodeSize=5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:UseBaggedBoost:BaggedSampleFraction=0.5:SeparationType=SDivSqrtSPlusB:nCuts=20" );
 
     if (Use["BDT_D2"])
         factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDT_D2",
-                           "!H:!V:NTrees=800:MinNodeSize=5%:MaxDepth=2:BoostType=AdaBoost:AdaBoostBeta=0.5:UseBaggedBoost:BaggedSampleFraction=0.5:SeparationType=GiniIndex:nCuts=20" );
+                           "!H:!V:NTrees=800:MinNodeSize=5%:MaxDepth=2:BoostType=AdaBoost:AdaBoostBeta=0.5:UseBaggedBoost:BaggedSampleFraction=0.5:SeparationType=SDivSqrtSPlusB:nCuts=20" );
 
     if (Use["BDT_D4"])
         factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDT_D4",
-                           "!H:!V:NTrees=800:MinNodeSize=5%:MaxDepth=4:BoostType=AdaBoost:AdaBoostBeta=0.5:UseBaggedBoost:BaggedSampleFraction=0.5:SeparationType=GiniIndex:nCuts=20" );
+                           "!H:!V:NTrees=800:MinNodeSize=5%:MaxDepth=4:BoostType=AdaBoost:AdaBoostBeta=0.5:UseBaggedBoost:BaggedSampleFraction=0.5:SeparationType=SDivSqrtSPlusB:nCuts=20" );
 
     if (Use["BDT_NS2p5"])
         factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDT_NS2p5",
-                           "!H:!V:NTrees=800:MinNodeSize=2.5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:UseBaggedBoost:BaggedSampleFraction=0.5:SeparationType=GiniIndex:nCuts=20" );
+                           "!H:!V:NTrees=800:MinNodeSize=2.5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:UseBaggedBoost:BaggedSampleFraction=0.5:SeparationType=SDivSqrtSPlusB:nCuts=20" );
    
     if (Use["BDT_NS10"])
         factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDT_NS10",
-                           "!H:!V:NTrees=800:MinNodeSize=10%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:UseBaggedBoost:BaggedSampleFraction=0.5:SeparationType=GiniIndex:nCuts=20" );
+                           "!H:!V:NTrees=800:MinNodeSize=10%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:UseBaggedBoost:BaggedSampleFraction=0.5:SeparationType=SDivSqrtSPlusB:nCuts=20" );
 
     if (Use["BDT_L3"])
         factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDT_L3",
-                           "!H:!V:NTrees=800:MinNodeSize=5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.3:UseBaggedBoost:BaggedSampleFraction=0.5:SeparationType=GiniIndex:nCuts=20" );
+                           "!H:!V:NTrees=800:MinNodeSize=5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.3:UseBaggedBoost:BaggedSampleFraction=0.5:SeparationType=SDivSqrtSPlusB:nCuts=20" );
 
     if (Use["BDT_L7"])
         factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDT_L7",
-                           "!H:!V:NTrees=800:MinNodeSize=5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.7:UseBaggedBoost:BaggedSampleFraction=0.5:SeparationType=GiniIndex:nCuts=20" );
+                           "!H:!V:NTrees=800:MinNodeSize=5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.7:UseBaggedBoost:BaggedSampleFraction=0.5:SeparationType=SDivSqrtSPlusB:nCuts=20" );
 
     //if (Use["BDTG"]) // Gradient Boost
     //    factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDTG",
