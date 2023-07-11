@@ -30,7 +30,7 @@
 
 using namespace TMVA;
 
-void Application_4Lep(){
+void Application_4Lep_OF(){
 
     // Load the TMVA library 
     TMVA::Tools::Instance();
@@ -40,14 +40,14 @@ void Application_4Lep(){
 
     // Make sure to use the same MVA methods as defined in the Classification_4Lep.C macro
     Use["BDT"]            = 1;
-    Use["BDT_T200"]       = 1;
-    Use["BDT_T400"]       = 1;
-    Use["BDT_D2"]         = 1;     
-    Use["BDT_D4"]         = 1;
-    Use["BDT_NS2p5"]      = 1;
-    Use["BDT_NS10"]       = 1;
-    Use["BDT_L3"]         = 1;
-    Use["BDT_L7"]         = 1;
+    //Use["BDT_T200"]       = 1;
+    //Use["BDT_T400"]       = 1;
+    //Use["BDT_D2"]         = 1;     
+    //Use["BDT_D4"]         = 1;
+    //Use["BDT_NS2p5"]      = 1;
+    //Use["BDT_NS10"]       = 1;
+    //Use["BDT_L3"]         = 1;
+    //Use["BDT_L7"]         = 1;
 
     std::cout << std::endl;
     std::cout << "===> Start 4Lepton MVA Application" << std::endl;
@@ -61,7 +61,8 @@ void Application_4Lep(){
     // - variable names MUST exactly match the name and type from the weight files
     float m_ll; 
     float dPhi_4Lep_MET; 
-    float dPhi_Zcand_MET; 
+    float dPhi_Zcand_MET;
+    float dPhi_WW_MET; 
     float dR_Wcands; 
     float dR_Zcands; 
     float MET; 
@@ -72,13 +73,12 @@ void Application_4Lep(){
     float subleading_Zcand_pt; 
     float leading_Wcand_pt; 
     float subleading_Wcand_pt;
-    float SFChannel; 
-    float OFChannel; 
     float weight;
 
     reader->AddVariable( "m_ll", &m_ll );  
     reader->AddVariable( "dPhi_4Lep_MET", &dPhi_4Lep_MET );    
     reader->AddVariable( "dPhi_Zcand_MET", &dPhi_Zcand_MET );
+    reader->AddVariable( "dPhi_WW_MET", &dPhi_WW_MET );
     reader->AddVariable( "dR_Wcands", &dR_Wcands );
     reader->AddVariable( "dR_Zcands", &dR_Zcands );
     reader->AddVariable( "MET", &MET );
@@ -89,15 +89,13 @@ void Application_4Lep(){
     reader->AddVariable( "subleading_Zcand_pt", &subleading_Zcand_pt );
     reader->AddVariable( "leading_Wcand_pt", &leading_Wcand_pt );
     reader->AddVariable( "subleading_Wcand_pt", &subleading_Wcand_pt );
-    reader->AddVariable( "SFChannel", &SFChannel );
-    reader->AddVariable( "OFChannel", &OFChannel );
 
     // Add spectator variables to the reader
     // - Those defined in the training must also be added to the reader
 
     // Tell the reader where to find the weights
     TString dir = "dataset/weights/";
-    TString prefix = "All_methods_070323";
+    TString prefix = "Default_OFChannel";
 
     for (std::map<std::string,int>::iterator it = Use.begin(); it != Use.end(); it++) {
       if (it->second) {
@@ -109,37 +107,6 @@ void Application_4Lep(){
 
    // Book output histograms
    UInt_t nbin = 100;
-   // Define BDT output histograms for every method and process that we care about
-   //TH1F *histBDT_D4_signal(0);
-   //TH1F *histBDT_D4_ZZ(0); 
-   //TH1F *histBDT_D4_TTZ(0); 
-   //TH1F *histBDT_D4_WZ(0);
-   //TH1F *histBDT_D4_Higgs(0);
-   //TH1F *histBDT_D4_Other(0);
-   //TH1F *histBDT_L7_signal(0);
-   //TH1F *histBDT_L7_ZZ(0);
-   //TH1F *histBDT_L7_TTZ(0);
-   //TH1F *histBDT_L7_WZ(0);
-   //TH1F *histBDT_L7_Higgs(0);
-   //TH1F *histBDT_L7_Other(0);
-
-   // Let's just do this for the D4 and L7 options since they perform the best....
-   //if (Use["BDT_D4"]){
-   //     histBDT_D4_signal = new TH1F( "MVA_BDT_D4_signal", "MVA_BDT_D4_signal", nbin, -1.0, 1.0 );
-   //     histBDT_D4_ZZ     = new TH1F( "MVA_BDT_D4_ZZ", "MVA_BDT_D4_ZZ", nbin, -1.0, 1.0 );
-   //     histBDT_D4_TTZ    = new TH1F( "MVA_BDT_D4_TTZ", "MVA_BDT_D4_TTZ", nbin, -1.0, 1.0 );
-   //     histBDT_D4_WZ     = new TH1F( "MVA_BDT_D4_WZ", "MVA_BDT_D4_WZ", nbin, -1.0, 1.0 );
-   //     histBDT_D4_Higgs  = new TH1F( "MVA_BDT_D4_Higgs", "MVA_BDT_D4_Higgs", nbin, -1.0, 1.0 );
-   //     histBDT_D4_Other  = new TH1F( "MVA_BDT_D4_Other", "MVA_BDT_D4_Other", nbin, -1.0, 1.0 );      
-   //}     
-   //if (Use["BDT_L7"]){
-   //     histBDT_L7_signal = new TH1F( "MVA_BDT_L7_signal", "MVA_BDT_L7_signal", nbin, -1.0, 1.0 );
-   //     histBDT_L7_ZZ     = new TH1F( "MVA_BDT_L7_ZZ", "MVA_BDT_L7_ZZ", nbin, -1.0, 1.0 );
-   //     histBDT_L7_TTZ    = new TH1F( "MVA_BDT_L7_TTZ", "MVA_BDT_L7_TTZ", nbin, -1.0, 1.0 );
-   //     histBDT_L7_WZ     = new TH1F( "MVA_BDT_L7_WZ", "MVA_BDT_L7_WZ", nbin, -1.0, 1.0 );
-   //     histBDT_L7_Higgs  = new TH1F( "MVA_BDT_L7_Higgs", "MVA_BDT_L7_Higgs", nbin, -1.0, 1.0 );
-   //     histBDT_L7_Other  = new TH1F( "MVA_BDT_L7_Other", "MVA_BDT_L7_Other", nbin, -1.0, 1.0 );  
-   //}
 
    // Prepare the input tree for the reader
    // This corresponds to the ROOT file that contains the tree that your variables live in
@@ -156,16 +123,17 @@ void Application_4Lep(){
 
    int idx = 0;
 
-   TString path = "/home/users/kdownham/Triboson/VVVNanoLooper/analysis/output_BDT_tree/Run2/";
+   TString path = "/home/users/kdownham/Triboson/VVVNanoLooper/analysis/output_070623_masterSync/Run2/";
    std::vector<TString> files = {"WWZ.root", "ZZ.root", "TTZ.root", "WZ.root", "Higgs.root", "Other.root"};
    for (auto f : files ){
         std::cout << "=============================================================" << std::endl;
 	std::cout << "Calculating MVA scores for events in file: " << f << std::endl;
 	TFile *input = TFile::Open( path+f );
-	TTree *tree  = (TTree*)input->Get("t_BDT");
+	TTree *tree  = (TTree*)input->Get("t_BDT_OF");
 	tree->SetBranchAddress("m_ll", &m_ll);        
 	tree->SetBranchAddress("dPhi_4Lep_MET", &dPhi_4Lep_MET);
 	tree->SetBranchAddress("dPhi_Zcand_MET", &dPhi_Zcand_MET);
+	tree->SetBranchAddress("dPhi_WW_MET", &dPhi_WW_MET);
 	tree->SetBranchAddress("dR_Wcands", &dR_Wcands);
 	tree->SetBranchAddress("dR_Zcands", &dR_Zcands);
 	tree->SetBranchAddress("MET", &MET);
@@ -176,8 +144,6 @@ void Application_4Lep(){
 	tree->SetBranchAddress("subleading_Zcand_pt", &subleading_Zcand_pt);
   	tree->SetBranchAddress("leading_Wcand_pt", &leading_Wcand_pt);
  	tree->SetBranchAddress("subleading_Wcand_pt", &subleading_Wcand_pt);
-	tree->SetBranchAddress("SFChannel", &SFChannel);
-	tree->SetBranchAddress("OFChannel", &OFChannel);
 	tree->SetBranchAddress("weight", &weight);
 
 	// Define an output tree
@@ -186,50 +152,50 @@ void Application_4Lep(){
         // Define the histograms
 
 	TH1F *histBDT(0);
-	TH1F *histBDT_T200(0);
-	TH1F *histBDT_T400(0);
-	TH1F *histBDT_D2(0);
-	TH1F *histBDT_D4(0);
-	TH1F *histBDT_L3(0);
-	TH1F *histBDT_L7(0);
-	TH1F *histBDT_NS2p5(0);
-	TH1F *histBDT_NS10(0);
+	//TH1F *histBDT_T200(0);
+	//TH1F *histBDT_T400(0);
+	//TH1F *histBDT_D2(0);
+	//TH1F *histBDT_D4(0);
+	//TH1F *histBDT_L3(0);
+	//TH1F *histBDT_L7(0);
+	//TH1F *histBDT_NS2p5(0);
+	//TH1F *histBDT_NS10(0);
 
 	if (Use["BDT"]){
 	    histBDT = new TH1F( "MVA_BDT", "MVA_BDT", nbin, -1.0, 1.0 );
 	}	
 
-	if (Use["BDT_T200"]){
-            histBDT_T200 = new TH1F( "MVA_BDT_T200", "MVA_BDT_T200", nbin, -1.0, 1.0 );
-        }
+	//if (Use["BDT_T200"]){
+        //    histBDT_T200 = new TH1F( "MVA_BDT_T200", "MVA_BDT_T200", nbin, -1.0, 1.0 );
+        //}
 
-	if (Use["BDT_T400"]){
-            histBDT_T400 = new TH1F( "MVA_BDT_T400", "MVA_BDT_T400", nbin, -1.0, 1.0 );
-        }
+	//if (Use["BDT_T400"]){
+        //    histBDT_T400 = new TH1F( "MVA_BDT_T400", "MVA_BDT_T400", nbin, -1.0, 1.0 );
+        //}
 
-	if (Use["BDT_D2"]){
-            histBDT_D2 = new TH1F( "MVA_BDT_D2", "MVA_BDT_D2", nbin, -1.0, 1.0 );
-        }
+	//if (Use["BDT_D2"]){
+        //    histBDT_D2 = new TH1F( "MVA_BDT_D2", "MVA_BDT_D2", nbin, -1.0, 1.0 );
+        //}
 
-        if (Use["BDT_D4"]){
-	    histBDT_D4 = new TH1F( "MVA_BDT_D4", "MVA_BDT_D4", nbin, -1.0, 1.0 );
-	}
+        //if (Use["BDT_D4"]){
+	//    histBDT_D4 = new TH1F( "MVA_BDT_D4", "MVA_BDT_D4", nbin, -1.0, 1.0 );
+	//}
 
-	if (Use["BDT_L3"]){
-            histBDT_L3 = new TH1F( "MVA_BDT_L3", "MVA_BDT_L3", nbin, -1.0, 1.0 );
-        }
+	//if (Use["BDT_L3"]){
+        //    histBDT_L3 = new TH1F( "MVA_BDT_L3", "MVA_BDT_L3", nbin, -1.0, 1.0 );
+        //}
 
-	if (Use["BDT_L7"]){
-	    histBDT_L7 = new TH1F( "MVA_BDT_L7", "MVA_BDT_L7", nbin, -1.0, 1.0 );
-	}
+	//if (Use["BDT_L7"]){
+	//    histBDT_L7 = new TH1F( "MVA_BDT_L7", "MVA_BDT_L7", nbin, -1.0, 1.0 );
+	//}
 
-	if (Use["BDT_NS2p5"]){
-            histBDT_NS2p5 = new TH1F( "MVA_BDT_NS2p5", "MVA_BDT_NS2p5", nbin, -1.0, 1.0 );
-        }
+	//if (Use["BDT_NS2p5"]){
+        //    histBDT_NS2p5 = new TH1F( "MVA_BDT_NS2p5", "MVA_BDT_NS2p5", nbin, -1.0, 1.0 );
+        //}
 
-	if (Use["BDT_NS10"]){
-            histBDT_NS10 = new TH1F( "MVA_BDT_NS10", "MVA_BDT_NS10", nbin, -1.0, 1.0 );
-        }
+	//if (Use["BDT_NS10"]){
+        //    histBDT_NS10 = new TH1F( "MVA_BDT_NS10", "MVA_BDT_NS10", nbin, -1.0, 1.0 );
+        //}
 
 	std::cout << "==============================================================" << std::endl;
 	std::cout << "--- Processing: " << tree->GetEntries() << " events" << std::endl;
@@ -265,8 +231,8 @@ void Application_4Lep(){
 		 float MVA_BDT = reader->EvaluateMVA("BDT method");    
 		 histBDT       -> Fill(MVA_BDT, weight);
 		 //t_MVA->Branch("MVA_BDT",&MVA_BDT,"MVA_BDT/F");
-		 if ( MVA_BDT > 0.1 ) c1_yields += weight;
-		 if ( MVA_BDT > 0.12 ) c2_yields += weight;
+		 if ( MVA_BDT > 0.05 ) c1_yields += weight;
+		 if ( MVA_BDT > 0.1 ) c2_yields += weight;
 		 if ( MVA_BDT > 0.2 ) c3_yields += weight;
 		 if ( MVA_BDT > 0.25 ) c4_yields += weight;	
              }
@@ -349,16 +315,15 @@ void Application_4Lep(){
 
 	std::cout << "--- Created root file: " << target->GetName() << " containing the MVA output histograms" << std::endl;	     
 
-	delete tree;
 	delete histBDT;
-	delete histBDT_T200;
-	delete histBDT_T400;
-	delete histBDT_D2;
-	delete histBDT_D4;
-	delete histBDT_L3;
-	delete histBDT_L7;
-	delete histBDT_NS2p5;
-	delete histBDT_NS10;
+	//delete histBDT_T200;
+	//delete histBDT_T400;
+	//delete histBDT_D2;
+	//delete histBDT_D4;
+	//delete histBDT_L3;
+	//delete histBDT_L7;
+	//delete histBDT_NS2p5;
+	//delete histBDT_NS10;
 	delete input;
 	delete target;
 
@@ -369,7 +334,7 @@ void Application_4Lep(){
    std::cout << "===> TMVA 4-lepton Application is done!" << std::endl;
 
    std::cout << "================================================================================" << std::endl;
-   std::cout << "Printing yields for MVA > 0.1" << std::endl;
+   std::cout << "Printing yields for MVA > 0.05" << std::endl;
    std::cout << "--------------------------------------------------------------------------------" << std::endl;
    std::cout << "WWZ = " << yields_c1[0] << std::endl;
    std::cout << "ZZ = " << yields_c1[1] << std::endl;
@@ -378,7 +343,7 @@ void Application_4Lep(){
    std::cout << "Higgs = " << yields_c1[4] << std::endl;
    std::cout << "Other = " << yields_c1[5] << std::endl;
    std::cout << "================================================================================" << std::endl;
-   std::cout << "Printing yields for MVA > 0.12" << std::endl;
+   std::cout << "Printing yields for MVA > 0.1" << std::endl;
    std::cout << "--------------------------------------------------------------------------------" << std::endl;
    std::cout << "WWZ = " << yields_c2[0] << std::endl;
    std::cout << "ZZ = " << yields_c2[1] << std::endl;
@@ -407,16 +372,16 @@ void Application_4Lep(){
    std::cout << "================================================================================" << std::endl;
    std::cout << "Signal Regions" << std::endl;
    std::cout << "--------------------------------------------------------------------------------" << std::endl;
-   std::cout << "MVA in [0.1,0.12]" << std::endl;
-   std::cout << "WWZ = " << yields_c2[0] - yields_c1[0] << std::endl;
+   std::cout << "MVA in [0.05,0.1]" << std::endl;
+   std::cout << "WWZ = " << -(yields_c2[0] - yields_c1[0]) << std::endl;
    std::cout << "Background = " << (yields_c2[1]+yields_c2[2]+yields_c2[3]+yields_c2[4]+yields_c2[5]) - (yields_c1[1]+yields_c1[2]+yields_c1[3]+yields_c1[4]+yields_c1[5]) << std::endl;
    std::cout << "--------------------------------------------------------------------------------" << std::endl;
-   std::cout << "MVA in [0.12,0.2]" << std::endl;
-   std::cout << "WWZ = " << yields_c3[0] - yields_c2[0] << std::endl;
+   std::cout << "MVA in [0.1,0.2]" << std::endl;
+   std::cout << "WWZ = " << -(yields_c3[0] - yields_c2[0]) << std::endl;
    std::cout << "Background = " << (yields_c3[1]+yields_c3[2]+yields_c3[3]+yields_c3[4]+yields_c3[5]) - (yields_c2[1]+yields_c2[2]+yields_c2[3]+yields_c2[4]+yields_c2[5]) << std::endl;
    std::cout << "--------------------------------------------------------------------------------" << std::endl;
    std::cout << "MVA in [0.2,0.25]" << std::endl;
-   std::cout << "WWZ = " << yields_c4[0] - yields_c3[0] << std::endl;
+   std::cout << "WWZ = " << -(yields_c4[0] - yields_c3[0]) << std::endl;
    std::cout << "Background = " << (yields_c4[1]+yields_c4[2]+yields_c4[3]+yields_c4[4]+yields_c4[5]) - (yields_c3[1]+yields_c3[2]+yields_c3[3]+yields_c3[4]+yields_c3[5]) << std::endl;
    std::cout << "--------------------------------------------------------------------------------" << std::endl;
    std::cout << "MVA > 0.25" << std::endl;
