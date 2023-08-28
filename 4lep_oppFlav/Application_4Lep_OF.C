@@ -121,6 +121,11 @@ void Application_4Lep_OF(){
    std::vector<float> yields_c3;
    std::vector<float> yields_c4;
 
+   std::vector<float> error_c1;
+   std::vector<float> error_c2;
+   std::vector<float> error_c3;
+   std::vector<float> error_c4;
+
    int idx = 0;
 
    TString path = "/home/users/kdownham/Triboson/VVVNanoLooper/analysis/output_070623_masterSync/Run2/";
@@ -204,6 +209,11 @@ void Application_4Lep_OF(){
 	float c2_yields = 0.;
 	float c3_yields = 0.;
 	float c4_yields = 0.;
+
+        float c1_sumSQweights = 0.;
+	float c2_sumSQweights = 0.;
+        float c3_sumSQweights = 0.;
+	float c4_sumSQweights = 0.;
 	
         for (Long64_t ievt=0; ievt<tree->GetEntries();ievt++){
 	     if (ievt%1000 == 0) std::cout << "--- ... Processing event: " << ievt << std::endl;
@@ -231,10 +241,22 @@ void Application_4Lep_OF(){
 		 float MVA_BDT = reader->EvaluateMVA("BDT method");    
 		 histBDT       -> Fill(MVA_BDT, weight);
 		 //t_MVA->Branch("MVA_BDT",&MVA_BDT,"MVA_BDT/F");
-		 if ( MVA_BDT > 0.05 ) c1_yields += weight;
-		 if ( MVA_BDT > 0.1 ) c2_yields += weight;
-		 if ( MVA_BDT > 0.2 ) c3_yields += weight;
-		 if ( MVA_BDT > 0.25 ) c4_yields += weight;	
+		 if ( MVA_BDT > 0.05 ){ 
+		        c1_yields += weight;
+		 	c1_sumSQweights += std::pow(weight, 2.0);
+		 }
+		 if ( MVA_BDT > 0.1 ){ 
+			c2_yields += weight;
+			c2_sumSQweights += std::pow(weight, 2.0);
+		 }
+		 if ( MVA_BDT > 0.2 ){ 
+			c3_yields += weight;
+			c3_sumSQweights += std::pow(weight, 2.0);
+		 }
+		 if ( MVA_BDT > 0.25 ){ 
+			c4_yields += weight;
+			c4_sumSQweights += std::pow(weight, 2.0);
+		 }	
              }
 
 	     
@@ -296,6 +318,11 @@ void Application_4Lep_OF(){
 	yields_c3.push_back(c3_yields);
 	yields_c4.push_back(c4_yields);
 
+	error_c1.push_back(std::sqrt(c1_sumSQweights));
+	error_c2.push_back(std::sqrt(c2_sumSQweights));
+	error_c3.push_back(std::sqrt(c3_sumSQweights));
+    	error_c4.push_back(std::sqrt(c4_sumSQweights));
+
 	std::cout << "--- End of event loop ---" << std::endl;
 	// Write histograms
 	TFile *target = new TFile( "outputs/MVA_"+f, "RECREATE" );
@@ -331,62 +358,69 @@ void Application_4Lep_OF(){
 
    delete reader;
 
+   // compute errors here
+   
+   float bkgerr_1 = std::sqrt(std::pow(std::pow(error_c1[1],2.)+std::pow(error_c1[2],2.)+std::pow(error_c1[3],2.)+std::pow(error_c1[4],2.)+std::pow(error_c1[5],2.),2.0)+std::pow(std::pow(error_c2[1],2.)+std::pow(error_c2[2],2.)+std::pow(error_c2[3],2.)+std::pow(error_c2[4],2.)+std::pow(error_c2[5],2.),2.0));
+   float bkgerr_2 = std::sqrt(std::pow(std::pow(error_c3[1],2.)+std::pow(error_c3[2],2.)+std::pow(error_c3[3],2.)+std::pow(error_c3[4],2.)+std::pow(error_c3[5],2.),2.0)+std::pow(std::pow(error_c2[1],2.)+std::pow(error_c2[2],2.)+std::pow(error_c2[3],2.)+std::pow(error_c2[4],2.)+std::pow(error_c2[5],2.),2.0));
+   float bkgerr_3 = std::sqrt(std::pow(std::pow(error_c4[1],2.)+std::pow(error_c4[2],2.)+std::pow(error_c4[3],2.)+std::pow(error_c4[4],2.)+std::pow(error_c4[5],2.),2.0)+std::pow(std::pow(error_c3[1],2.)+std::pow(error_c3[2],2.)+std::pow(error_c3[3],2.)+std::pow(error_c3[4],2.)+std::pow(error_c3[5],2.),2.0));
+   float bkgerr_4 = std::sqrt(std::pow(error_c4[1],2.)+std::pow(error_c4[2],2.)+std::pow(error_c4[3],2.)+std::pow(error_c4[4],2.));
+
    std::cout << "===> TMVA 4-lepton Application is done!" << std::endl;
 
    std::cout << "================================================================================" << std::endl;
    std::cout << "Printing yields for MVA > 0.05" << std::endl;
    std::cout << "--------------------------------------------------------------------------------" << std::endl;
-   std::cout << "WWZ = " << yields_c1[0] << std::endl;
-   std::cout << "ZZ = " << yields_c1[1] << std::endl;
-   std::cout << "TTZ = " << yields_c1[2] << std::endl;
-   std::cout << "WZ = " << yields_c1[3] << std::endl;
-   std::cout << "Higgs = " << yields_c1[4] << std::endl;
-   std::cout << "Other = " << yields_c1[5] << std::endl;
+   std::cout << "WWZ = "   << yields_c1[0] << "+/-" << error_c1[0] <<  std::endl;
+   std::cout << "ZZ = "    << yields_c1[1] << "+/-" << error_c1[1] <<  std::endl;
+   std::cout << "TTZ = "   << yields_c1[2] << "+/-" << error_c1[2] <<  std::endl;
+   std::cout << "WZ = "    << yields_c1[3] << "+/-" << error_c1[3] <<  std::endl;
+   std::cout << "Higgs = " << yields_c1[4] << "+/-" << error_c1[4] <<  std::endl;
+   std::cout << "Other = " << yields_c1[5] << "+/-" << error_c1[5] <<  std::endl;
    std::cout << "================================================================================" << std::endl;
    std::cout << "Printing yields for MVA > 0.1" << std::endl;
    std::cout << "--------------------------------------------------------------------------------" << std::endl;
-   std::cout << "WWZ = " << yields_c2[0] << std::endl;
-   std::cout << "ZZ = " << yields_c2[1] << std::endl;
-   std::cout << "TTZ = " << yields_c2[2] << std::endl;
-   std::cout << "WZ = " << yields_c2[3] << std::endl;
-   std::cout << "Higgs = " << yields_c2[4] << std::endl;
-   std::cout << "Other = " << yields_c2[5] << std::endl;
+   std::cout << "WWZ = "   << yields_c2[0] << "+/-" << error_c2[0] << std::endl;
+   std::cout << "ZZ = "    << yields_c2[1] << "+/-" << error_c2[1] << std::endl;
+   std::cout << "TTZ = "   << yields_c2[2] << "+/-" << error_c2[2] << std::endl;
+   std::cout << "WZ = "    << yields_c2[3] << "+/-" << error_c2[3] << std::endl;
+   std::cout << "Higgs = " << yields_c2[4] << "+/-" << error_c2[4] << std::endl;
+   std::cout << "Other = " << yields_c2[5] << "+/-" << error_c2[5] << std::endl;
    std::cout << "================================================================================" << std::endl;
    std::cout << "Printing yields for MVA > 0.2" << std::endl;
    std::cout << "--------------------------------------------------------------------------------" << std::endl;
-   std::cout << "WWZ = " << yields_c3[0] << std::endl;
-   std::cout << "ZZ = " << yields_c3[1] << std::endl;
-   std::cout << "TTZ = " << yields_c3[2] << std::endl;
-   std::cout << "WZ = " << yields_c3[3] << std::endl;
-   std::cout << "Higgs = " << yields_c3[4] << std::endl;
-   std::cout << "Other = " << yields_c3[5] << std::endl;
+   std::cout << "WWZ = "   << yields_c3[0] << "+/-" << error_c3[0] << std::endl;
+   std::cout << "ZZ = "    << yields_c3[1] << "+/-" << error_c3[1] << std::endl;
+   std::cout << "TTZ = "   << yields_c3[2] << "+/-" << error_c3[2] << std::endl;
+   std::cout << "WZ = "    << yields_c3[3] << "+/-" << error_c3[3] << std::endl;
+   std::cout << "Higgs = " << yields_c3[4] << "+/-" << error_c3[4] << std::endl;
+   std::cout << "Other = " << yields_c3[5] << "+/-" << error_c3[5] << std::endl;
    std::cout << "================================================================================" << std::endl;
    std::cout << "Printing yields for MVA > 0.25" << std::endl;
    std::cout << "--------------------------------------------------------------------------------" << std::endl;
-   std::cout << "WWZ = " << yields_c4[0] << std::endl;
-   std::cout << "ZZ = " << yields_c4[1] << std::endl;
-   std::cout << "TTZ = " << yields_c4[2] << std::endl;
-   std::cout << "WZ = " << yields_c4[3] << std::endl;
-   std::cout << "Higgs = " << yields_c4[4] << std::endl;
-   std::cout << "Other = " << yields_c4[5] << std::endl;
+   std::cout << "WWZ = "   << yields_c4[0] << "+/-" << error_c4[0] << std::endl;
+   std::cout << "ZZ = "    << yields_c4[1] << "+/-" << error_c4[1] << std::endl;
+   std::cout << "TTZ = "   << yields_c4[2] << "+/-" << error_c4[2] << std::endl;
+   std::cout << "WZ = "    << yields_c4[3] << "+/-" << error_c4[3] << std::endl;
+   std::cout << "Higgs = " << yields_c4[4] << "+/-" << error_c4[4] << std::endl;
+   std::cout << "Other = " << yields_c4[5] << "+/-" << error_c4[5] << std::endl;
    std::cout << "================================================================================" << std::endl;
    std::cout << "Signal Regions" << std::endl;
    std::cout << "--------------------------------------------------------------------------------" << std::endl;
    std::cout << "MVA in [0.05,0.1]" << std::endl;
-   std::cout << "WWZ = " << -(yields_c2[0] - yields_c1[0]) << std::endl;
-   std::cout << "Background = " << (yields_c2[1]+yields_c2[2]+yields_c2[3]+yields_c2[4]+yields_c2[5]) - (yields_c1[1]+yields_c1[2]+yields_c1[3]+yields_c1[4]+yields_c1[5]) << std::endl;
+   std::cout << "WWZ = " << -(yields_c2[0] - yields_c1[0]) << "+/-" << std::sqrt(std::pow(error_c2[0],2.)+std::pow(error_c1[0],2.))  << std::endl;
+   std::cout << "Background = " << (yields_c2[1]+yields_c2[2]+yields_c2[3]+yields_c2[4]+yields_c2[5]) - (yields_c1[1]+yields_c1[2]+yields_c1[3]+yields_c1[4]+yields_c1[5]) << "+/-" << bkgerr_1 << std::endl;
    std::cout << "--------------------------------------------------------------------------------" << std::endl;
    std::cout << "MVA in [0.1,0.2]" << std::endl;
-   std::cout << "WWZ = " << -(yields_c3[0] - yields_c2[0]) << std::endl;
-   std::cout << "Background = " << (yields_c3[1]+yields_c3[2]+yields_c3[3]+yields_c3[4]+yields_c3[5]) - (yields_c2[1]+yields_c2[2]+yields_c2[3]+yields_c2[4]+yields_c2[5]) << std::endl;
+   std::cout << "WWZ = " << -(yields_c3[0] - yields_c2[0]) << "+/-" << std::sqrt(std::pow(error_c3[0],2.)+std::pow(error_c2[0],2.)) << std::endl;
+   std::cout << "Background = " << (yields_c3[1]+yields_c3[2]+yields_c3[3]+yields_c3[4]+yields_c3[5]) - (yields_c2[1]+yields_c2[2]+yields_c2[3]+yields_c2[4]+yields_c2[5]) << "+/-" << bkgerr_2 <<std::endl;
    std::cout << "--------------------------------------------------------------------------------" << std::endl;
    std::cout << "MVA in [0.2,0.25]" << std::endl;
-   std::cout << "WWZ = " << -(yields_c4[0] - yields_c3[0]) << std::endl;
-   std::cout << "Background = " << (yields_c4[1]+yields_c4[2]+yields_c4[3]+yields_c4[4]+yields_c4[5]) - (yields_c3[1]+yields_c3[2]+yields_c3[3]+yields_c3[4]+yields_c3[5]) << std::endl;
+   std::cout << "WWZ = " << -(yields_c4[0] - yields_c3[0]) << "+/-" << std::sqrt(std::pow(error_c4[0],2.)+std::pow(error_c3[0],2.)) << std::endl;
+   std::cout << "Background = " << (yields_c4[1]+yields_c4[2]+yields_c4[3]+yields_c4[4]+yields_c4[5]) - (yields_c3[1]+yields_c3[2]+yields_c3[3]+yields_c3[4]+yields_c3[5]) << "+/-" << bkgerr_3 << std::endl;
    std::cout << "--------------------------------------------------------------------------------" << std::endl;
    std::cout << "MVA > 0.25" << std::endl;
-   std::cout << "WWZ = " << yields_c4[0] << std::endl;
-   std::cout << "Background = " << (yields_c4[1]+yields_c4[2]+yields_c4[3]+yields_c4[4]+yields_c4[5]) << std::endl;
+   std::cout << "WWZ = " << yields_c4[0] << "+/-" << error_c4[0]  << std::endl;
+   std::cout << "Background = " << (yields_c4[1]+yields_c4[2]+yields_c4[3]+yields_c4[4]+yields_c4[5]) << "+/-" << bkgerr_4 << std::endl;
    std::cout << "--------------------------------------------------------------------------------" << std::endl;
 
 
