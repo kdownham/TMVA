@@ -7,3 +7,10 @@ Refer to the user's guide (Section 2) for setup instructions before running the 
 
 In the simple example, a BDT is used to separate a rare Standard Model signal process (WWZ production) from a large Standard Model background process (ZZ production).
 Two discriminating kinematic variables are trained on to separate the signal from the background, and the MVA score is computed for the signal process.
+
+# Application to a 4-lepton analysis
+
+The main part of this analysis focuses on the WWZ --> 4 lepton analysis. In this case, we have 2 signal processes (WWZ & ZH->ZWW*) that we would like to separate from background processes (namely ZZ and t$\bar{t}$Z). 
+There are also 2 channels that are defined for the 4-lepton analysis depending on the flavor of the leptons coming from the W bosons. If the leptons from the W's in the event are of the same flavor (ee/$\mu\mu$), they
+are considered to be part of the same flavor channel (see `Same_Flavor` directory), while if the leptons have different flavor (e$\mu$) they belong to the opposite flavor channel (see `Opposite_Flavor` directory).
+
