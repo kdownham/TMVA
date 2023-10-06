@@ -1,4 +1,4 @@
-```Opposite Flavor BDT Training```
+# Opposite Flavor BDT Training
 
 This directory is the home of macros for the training of the Opposite-Flavor BDTs for the 4-lepton analysis. There are 2 signal processes: WWZ (code for training in the `WWZ_vs_Backgrounds`
 directory), and ZH (code for training in `ZH_vs_Backgrounds` directory). The macros for the training are called `Classification.C`, and they take one argument: the name of the weights file 
