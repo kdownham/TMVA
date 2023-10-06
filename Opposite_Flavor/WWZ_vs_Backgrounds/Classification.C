@@ -3,8 +3,8 @@
 // Macro used for the training of various BDTs for the WWZ to 
 // 4 lepton analysis (CMS).
 //
-// This macro in particular trains BDTs targeting the opposite-flavor
-// channel
+// This macro in particular trains a BDT targeting the opposite-flavor
+// channel to discriminate WWZ from ZZ+ttZ
 //
 //=====================================================================
 //
@@ -86,7 +86,7 @@ int Classification(TString weightName){
     TFile *input_signal(0);
     TString fname_signal = dir+"NonResWWZ.root";
     TFile *input_bkgd(0);
-    TString fname_bkgd = dir+"BDT_Backgrounds.root";
+    TString fname_bkgd = dir+"BDT_Backgrounds.root"; // This is a sum of ZZ and ttZ
 
     // Open the files for signal and background
     input_signal = TFile::Open(fname_signal);
@@ -174,13 +174,12 @@ int Classification(TString weightName){
 //					  "nTrain_Signal=0:nTest_Signal=0:nTrain_Background=0:nTest_Background=0:!V" );
 
     // Boosted Decision Trees (BDTs)
+    // =============================================================================================
+    // This is where you can specify the hyperparameters for the different methods you want to train
+    // =============================================================================================
     if (Use["BDT"]) // Adaptive Boost
         factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDT",
                            "!H:!V:NTrees=800:MinNodeSize=5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:SeparationType=SDivSqrtSPlusB:nCuts=20:NegWeightTreatment=IgnoreNegWeightsInTraining" );
-
-    ////if (Use["BDT"]) // Adaptive Boost
-    ////    factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDT",
-    ////                       "!H:!V:NTrees=800:MinNodeSize=5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:SeparationType=SDivSqrtSPlusB:nCuts=20" );
 
     if (Use["BDT_T200"])
         factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDT_T200",
