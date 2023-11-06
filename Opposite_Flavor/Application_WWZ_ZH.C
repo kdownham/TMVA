@@ -105,8 +105,8 @@ void Application_WWZ_ZH(){
          }
      }
 
-     TString path = "/home/users/kdownham/Triboson/VVVNanoLooper/analysis/output_090123_metFix/Run2/";  // Path pointing towards your MC file directory
-     std::vector<TString> files = {"NonResWWZ.root", "ZHWWZ.root", "TTZ.root", "ZZ.root", "Higgs.root", "WZ.root", "Other.root"};  // Name of MC files that we want to evaluate
+     TString path = "/home/users/kdownham/Triboson/VVVNanoLooper/analysis/output_110623_Sync/Run2/";  // Path pointing towards your MC file directory
+     std::vector<TString> files = {"NonResWWZ.root", "ZHWWZ.root", "TTZ.root", "ZZ.root", "tWZ.root", "WZ.root", "VVV.root", "Other.root"};  // Name of MC files that we want to evaluate
 
      ofstream mva_scores;
      mva_scores.open("mva_scores_OF.txt");  // This is the output text file containing the mva scores for each event
@@ -141,9 +141,10 @@ void Application_WWZ_ZH(){
           if ( f == "ZHWWZ.root" ) proc += 1;
           if ( f == "TTZ.root" ) proc += 2;
           if ( f == "ZZ.root"  ) proc += 3;
-	  if ( f == "Higgs.root" ) proc += 4;
+	  if ( f == "tWZ.root" ) proc += 4;
 	  if ( f == "WZ.root" ) proc += 5;
 	  if ( f == "Other.root" ) proc += 6;
+	  if ( f == "VVV.root" ) proc += 7;
 
           for (Long64_t ievt=0; ievt<tree->GetEntries(); ievt++){
                if (ievt%1000 == 0){
