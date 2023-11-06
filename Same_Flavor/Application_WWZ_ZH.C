@@ -97,8 +97,8 @@ void Application_WWZ_ZH(){
          }
      }
 
-     TString path = "/home/users/kdownham/Triboson/VVVNanoLooper/analysis/output_090123_metFix/Run2/";
-     std::vector<TString> files = {"NonResWWZ.root", "ZHWWZ.root", "TTZ.root", "ZZ.root", "Higgs.root", "WZ.root", "Other.root"};
+     TString path = "/home/users/kdownham/Triboson/VVVNanoLooper/analysis/output_110623_Sync/Run2/";
+     std::vector<TString> files = {"NonResWWZ.root", "ZHWWZ.root", "TTZ.root", "ZZ.root", "tWZ.root", "WZ.root", "VVV.root", "Other.root"};
 
      ofstream mva_scores;
      mva_scores.open("mva_scores_SF.txt");
@@ -132,9 +132,10 @@ void Application_WWZ_ZH(){
           if ( f == "ZHWWZ.root" ) proc += 1;
           if ( f == "TTZ.root" ) proc += 2;
           if ( f == "ZZ.root"  ) proc += 3;
-	  if ( f == "Higgs.root") proc += 4;
+	  if ( f == "tWZ.root") proc += 4;
 	  if ( f == "WZ.root" ) proc += 5;
 	  if ( f == "Other.root" ) proc += 6;
+	  if ( f == "VVV.root" ) proc += 7;
 
           for (Long64_t ievt=0; ievt<tree->GetEntries(); ievt++){
                if (ievt%1000 == 0){

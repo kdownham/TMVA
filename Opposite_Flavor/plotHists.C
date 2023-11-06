@@ -4,7 +4,7 @@
 std::vector<TH1F*> WWZ_hists(int nbin);
 std::vector<TH1F*> ZH_hists(int nbin);
 
-void plotHists(bool draw2Donly=true, bool makeSRs=true, bool drawSRs=false, bool makeDatacard=true, bool makeLatex=false){
+void plotHists(bool draw2Donly=true, bool makeSRs=true, bool drawSRs=false, bool makeDatacard=true, bool makeLatex=true){
 
      int nbin = 50;
      int LW = 5;
@@ -207,7 +207,7 @@ void plotHists(bool draw2Donly=true, bool makeSRs=true, bool drawSRs=false, bool
           bool wwz_SR2 = ( wwz_score < 0.7 && wwz_score > 0.4 && zh_score < -0.6 );
           bool zh_SR1  = ( wwz_score > 0.5 && zh_score > 0.7 );
           bool zh_SR2  = ( wwz_score < 0.5 && wwz_score > -0.2 && zh_score > 0.7 );
-          bool original_SRs = ( wwz_SR1 && wwz_SR2 && zh_SR1 && zh_SR2 );
+          bool original_SRs = ( wwz_SR1 || wwz_SR2 || zh_SR1 || zh_SR2 );
           bool wwz_SR3 = ( !original_SRs && wwz_score > 0.0 && zh_score < (0.8*(wwz_score-1.)) );
           bool wwz_SR4 = ( (!original_SRs && !wwz_SR3) && wwz_score > 0.0 );
           bool zh_SR3  = ( (!original_SRs && !wwz_SR3 && !wwz_SR4) && zh_score > 0.5 );
@@ -352,11 +352,11 @@ void plotHists(bool draw2Donly=true, bool makeSRs=true, bool drawSRs=false, bool
                     c5_ttz += weight;
                     c5_ttz_error += std::pow(weight,2.);
                }
-               if ( wwz_SR3 ){
+               if ( wwz_SR4 ){
                     c6_ttz += weight;
                     c6_ttz_error += std::pow(weight,2.);
                }
-               if ( zh_SR4 ){
+               if ( zh_SR3 ){
                     c7_ttz += weight;
                     c7_ttz_error += std::pow(weight,2.);
                }
@@ -976,11 +976,36 @@ void plotHists(bool draw2Donly=true, bool makeSRs=true, bool drawSRs=false, bool
          datacard << "------------------------------------------------------------------------------" << "\n";
 
          datacard.close();
-         //std::cout << "Wrote Combine datacard to file: datacard_mva_OF_"+tag+".txt" << std::cout;
 
      }
 
      if (makeLatex){
+
+         ofstream texfile;
+         texfile.open("yields_mva_OF_"+tag+".tex");
+
+         texfile << "\\begin{table}[]" << "\n";
+         texfile << "     \\centering" << "\n";
+         texfile << "        \\scalebox{0.40}{" << "\n";
+         texfile << "\\begin{tabular}{@{\\extracolsep{4pt}}lccccccccc@{}}" << "\n";
+         texfile << "\\hline\\hline" << "\n";
+         texfile << "\\multirow{2}{*}{MVA SR Bin} & \\multicolumn{3}{c}{Summary} & \\multicolumn{6}{c}{Composition of $\\Sigma$(bkgds)} \\\\ \\cline{2-4}\\cline{5-10}" << "\n";
+         texfile << "      & $\\Sigma$(bkgds) & NonResWWZ & ZHWWZ & ZZ & ttZ & tWZ & WZ & VVV & Other \\\\ \\hline" << "\n";
+         texfile << "      SR 1 & \\textcolor{red}{" << c1_bkg << " $\\pm$ " << c1_bkg_error << " } & \\textcolor{blue}{" << c1_wwz << " $\\pm$ " << c1_wwz_error << " } & \\textcolor{blue}{" << c1_zh << " $\\pm$ " << c1_zh_error << " } & " << c1_zz << " $\\pm$ " << c1_zz_error << " & " << c1_ttz << " $\\pm$ " << c1_ttz_error << " & " << c1_twz << " $\\pm$ " << c1_twz_error << " & " << c1_wz << " $\\pm$ " << c1_wz_error << " & " << c1_vvv << " $\\pm$ " << c1_vvv_error << " & " << c1_other << " $\\pm$ " << c1_other_error << " \\\\ " << "\n";
+         texfile << "      SR 2 & \\textcolor{red}{" << c2_bkg << " $\\pm$ " << c2_bkg_error << " } & \\textcolor{blue}{" << c2_wwz << " $\\pm$ " << c2_wwz_error << " } & \\textcolor{blue}{" << c2_zh << " $\\pm$ " << c2_zh_error << " } & " << c2_zz << " $\\pm$ " << c2_zz_error << " & " << c2_ttz << " $\\pm$ " << c2_ttz_error << " & " << c2_twz << " $\\pm$ " << c2_twz_error << " & " << c2_wz << " $\\pm$ " << c2_wz_error << " & " << c2_vvv << " $\\pm$ " << c2_vvv_error << " & " << c2_other << " $\\pm$ " << c2_other_error << " \\\\ " << "\n";
+         texfile << "      SR 3 & \\textcolor{red}{" << c3_bkg << " $\\pm$ " << c3_bkg_error << " } & \\textcolor{blue}{" << c3_wwz << " $\\pm$ " << c3_wwz_error << " } & \\textcolor{blue}{" << c3_zh << " $\\pm$ " << c3_zh_error << " } & " << c3_zz << " $\\pm$ " << c3_zz_error << " & " << c3_ttz << " $\\pm$ " << c3_ttz_error << " & " << c3_twz << " $\\pm$ " << c3_twz_error << " & " << c3_wz << " $\\pm$ " << c3_wz_error << " & " << c3_vvv << " $\\pm$ " << c3_vvv_error << " & " << c3_other << " $\\pm$ " << c3_other_error << " \\\\ " << "\n";
+         texfile << "      SR 4 & \\textcolor{red}{" << c4_bkg << " $\\pm$ " << c4_bkg_error << " } & \\textcolor{blue}{" << c4_wwz << " $\\pm$ " << c4_wwz_error << " } & \\textcolor{blue}{" << c4_zh << " $\\pm$ " << c4_zh_error << " } & " << c4_zz << " $\\pm$ " << c4_zz_error << " & " << c4_ttz << " $\\pm$ " << c4_ttz_error << " & " << c4_twz << " $\\pm$ " << c4_twz_error << " & " << c4_wz << " $\\pm$ " << c4_wz_error << " & " << c4_vvv << " $\\pm$ " << c4_vvv_error << " & " << c4_other << " $\\pm$ " << c4_other_error << " \\\\ " << "\n";
+         texfile << "      SR 5 & \\textcolor{red}{" << c5_bkg << " $\\pm$ " << c5_bkg_error << " } & \\textcolor{blue}{" << c5_wwz << " $\\pm$ " << c5_wwz_error << " } & \\textcolor{blue}{" << c5_zh << " $\\pm$ " << c5_zh_error << " } & " << c5_zz << " $\\pm$ " << c5_zz_error << " & " << c5_ttz << " $\\pm$ " << c5_ttz_error << " & " << c5_twz << " $\\pm$ " << c5_twz_error << " & " << c5_wz << " $\\pm$ " << c5_wz_error << " & " << c5_vvv << " $\\pm$ " << c5_vvv_error << " & " << c5_other << " $\\pm$ " << c5_other_error << " \\\\ " << "\n";
+         texfile << "      SR 6 & \\textcolor{red}{" << c6_bkg << " $\\pm$ " << c6_bkg_error << " } & \\textcolor{blue}{" << c6_wwz << " $\\pm$ " << c6_wwz_error << " } & \\textcolor{blue}{" << c6_zh << " $\\pm$ " << c6_zh_error << " } & " << c6_zz << " $\\pm$ " << c6_zz_error << " & " << c6_ttz << " $\\pm$ " << c6_ttz_error << " & " << c6_twz << " $\\pm$ " << c6_twz_error << " & " << c6_wz << " $\\pm$ " << c6_wz_error << " & " << c6_vvv << " $\\pm$ " << c6_vvv_error << " & " << c6_other << " $\\pm$ " << c6_other_error << " \\\\ " << "\n";
+         texfile << "      SR 7 & \\textcolor{red}{" << c7_bkg << " $\\pm$ " << c7_bkg_error << " } & \\textcolor{blue}{" << c7_wwz << " $\\pm$ " << c7_wwz_error << " } & \\textcolor{blue}{" << c7_zh << " $\\pm$ " << c7_zh_error << " } & " << c7_zz << " $\\pm$ " << c7_zz_error << " & " << c7_ttz << " $\\pm$ " << c7_ttz_error << " & " << c7_twz << " $\\pm$ " << c7_twz_error << " & " << c7_wz << " $\\pm$ " << c7_wz_error << " & " << c7_vvv << " $\\pm$ " << c7_vvv_error << " & " << c7_other << " $\\pm$ " << c7_other_error << " \\\\ " << "\n";
+         texfile << "      SR 8 & \\textcolor{red}{" << c8_bkg << " $\\pm$ " << c8_bkg_error << " } & \\textcolor{blue}{" << c8_wwz << " $\\pm$ " << c8_wwz_error << " } & \\textcolor{blue}{" << c8_zh << " $\\pm$ " << c8_zh_error << " } & " << c8_zz << " $\\pm$ " << c8_zz_error << " & " << c8_ttz << " $\\pm$ " << c8_ttz_error << " & " << c8_twz << " $\\pm$ " << c8_twz_error << " & " << c8_wz << " $\\pm$ " << c8_wz_error << " & " << c8_vvv << " $\\pm$ " << c8_vvv_error << " & " << c8_other << " $\\pm$ " << c8_other_error << " \\\\ " << "\n";
+         texfile << "\\hline\\hline" << "\n";
+         texfile << "  \\end{tabular}}" << "\n";
+         texfile << "  \\caption{Yields in the 4-lepton Opposite-Flavor MVA signal regions}" << "\n";
+         texfile << "    \\label{tab:my_label}" << "\n";
+         texfile << "\\end{table}" << "\n";
+
+         texfile.close();
 
      }
 
