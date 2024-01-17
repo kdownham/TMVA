@@ -137,7 +137,7 @@ void validationPlots(){
      c1->cd();    
 
      h1_wwz_train->SetStats(0);
-     h1_wwz_train->GetYaxis()->SetRangeUser(0.,0.15); 
+     h1_wwz_train->GetYaxis()->SetRangeUser(0.,0.20); 
      h1_wwz_train->GetXaxis()->SetTitle("WWZ MVA Score");
      h1_wwz_train->GetYaxis()->SetTitle("Fraction of Events");
      h1_wwz_train->Draw("hist");
@@ -154,7 +154,7 @@ void validationPlots(){
      c2->cd();
 
      h2_wwz_train->SetStats(0);
-     h2_wwz_train->GetYaxis()->SetRangeUser(0.,0.15);
+     h2_wwz_train->GetYaxis()->SetRangeUser(0.,0.25);
      h2_wwz_train->GetXaxis()->SetTitle("ZH MVA Score");
      h2_wwz_train->GetYaxis()->SetTitle("Fraction of Events");
      h2_wwz_train->Draw("hist");

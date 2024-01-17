@@ -1,13 +1,13 @@
 std::vector<TH1F*> WWZ_hists(int nbin);
 std::vector<TH1F*> ZH_hists(int nbin);
 
-void plotHists(bool draw2Donly=true, bool makeSRs=true, bool drawSRs=false, bool makeDatacard=true, bool makeLatex=true){
+void plotHists(bool draw2Donly=false, bool makeSRs=false, bool drawSRs=false, bool makeDatacard=false, bool makeLatex=false){
 
      int nbin = 50;
      int LW = 5;
 
-     TString tag = "Sync_110623";
-     TString file = "mva_scores_Sync_110623.root";
+     TString tag = "newVars_010924";
+     TString file = "mva_scores_newVars_010924.root";
      TFile *f = TFile::Open(file);
 
      Int_t process;
@@ -194,28 +194,43 @@ void plotHists(bool draw2Donly=true, bool makeSRs=true, bool drawSRs=false, bool
      float c6_bkg_error = 0.;
      float c7_bkg_error = 0.;
      float c8_bkg_error = 0.;
+
+     float n_wwz_tot = 0.;
+     float n_zh_tot = 0.;
+     float n_bkg_tot = 0.;
  
      // Loop over events
      for (int i=0; i<t->GetEntries(); i++){
 	  t->GetEntry(i);
 
+          //THESE ARE THE OLD SRs
 	  //bool wwz_SR1 = ( wwz_score > 0.9 && zh_score > 0.8 );
           //bool wwz_SR2 = ( wwz_score > 0.9 && zh_score > -0.6 && zh_score < 0.8 );
           //bool zh_SR1  = ( wwz_score < 0.9 && wwz_score > 0.7 && zh_score > 0.85 );
           //bool zh_SR2  = ( wwz_score < 0.7 && wwz_score > 0.6 && zh_score > 0.85 ); 
 
-          bool wwz_SR1 = ( wwz_score > 0.30 && zh_score < -0.60 );
-          bool wwz_SR2 = ( wwz_score > 0.80 && zh_score > -0.60 && zh_score < 0.90 );
-          bool zh_SR1  = ( wwz_score > 0.7 && zh_score > 0.90 );
-          bool zh_SR2  = ( wwz_score < 0.7 && wwz_score > 0.0 && zh_score > 0.90 );
-          bool original_SRs = ( wwz_SR1 || wwz_SR2 || zh_SR1 || zh_SR2 );
-          // Define new SRs here
-	  bool wwz_SR3 = ( !original_SRs && (zh_score > 0.5 && wwz_score > 0.35) );
-	  bool wwz_SR4 = ( !(original_SRs || wwz_SR3) && (zh_score > 0.85 && wwz_score > -0.5) );
-          bool zh_SR3 = ( !(original_SRs || wwz_SR3 || wwz_SR4 ) && ( wwz_score > 0.8 ) );
+          ////bool wwz_SR1 = ( wwz_score > 0.30 && zh_score < -0.60 );
+          ////bool wwz_SR2 = ( wwz_score > 0.80 && zh_score > -0.60 && zh_score < 0.90 );
+          ////bool zh_SR1  = ( wwz_score > 0.7 && zh_score > 0.90 );
+          ////bool zh_SR2  = ( wwz_score < 0.7 && wwz_score > 0.0 && zh_score > 0.90 );
+          //bool original_SRs = ( wwz_SR1 || wwz_SR2 || zh_SR1 || zh_SR2 );
+          //// Define new SRs here
+	  //bool wwz_SR3 = ( !original_SRs && (zh_score > 0.5 && wwz_score > 0.35) );
+	  //bool wwz_SR4 = ( !(original_SRs || wwz_SR3) && (zh_score > 0.85 && wwz_score > -0.5) );
+          //bool zh_SR3 = ( !(original_SRs || wwz_SR3 || wwz_SR4 ) && ( wwz_score > 0.8 ) );
+
+          // These are the NEW SRs
+          bool wwz_SR1 = ( zh_score > 0.8 && wwz_score > 0.5 );
+          bool wwz_SR2 = ( !(wwz_SR1) && zh_score > 0.8 && wwz_score > -1.0 && wwz_score < 0.5 );
+          bool zh_SR1 =  ( !(wwz_SR1 || wwz_SR2) && zh_score > -0.5 && zh_score < 0.8 && wwz_score > 0.8 );
+          bool zh_SR2 =  ( !(wwz_SR1 || wwz_SR2 || zh_SR1 ) && zh_score < -0.5 && wwz_score > 0.5 );
+          bool wwz_SR3 = ( !(wwz_SR1 || wwz_SR2 || zh_SR1 || zh_SR2) && zh_score > 0.0 && zh_score < 0.8 && wwz_score < 0.0 );
+          bool wwz_SR4 = ( !(wwz_SR1 || wwz_SR2 || zh_SR1 || zh_SR2 || wwz_SR3) && zh_score > 0.0 && zh_score < 0.8 && wwz_score > 0.0 && wwz_score < 0.8 );
+          bool zh_SR3  = ( !(wwz_SR1 || wwz_SR2 || zh_SR1 || zh_SR2 || wwz_SR3 || wwz_SR4) && zh_score < 0.0 && wwz_score > 0.0 );
 
 	  // Fill histograms
 	  if ( process == 0 ){
+	       n_wwz_tot += weight;
                if (weight > 0.0) histBDT_WWZ->Fill(wwz_score,zh_score,weight);
 	       vec_WWZ[0]->Fill(wwz_score,weight);
 	       vec_ZH[0]->Fill(zh_score,weight);
@@ -253,6 +268,7 @@ void plotHists(bool draw2Donly=true, bool makeSRs=true, bool drawSRs=false, bool
                
           }
 	  if ( process == 1 ){
+	       n_zh_tot += weight;
                if (weight > 0.0) histBDT_ZH->Fill(wwz_score,zh_score,weight);
 	       vec_WWZ[1]->Fill(wwz_score,weight);
                vec_ZH[1]->Fill(zh_score,weight);
@@ -288,6 +304,7 @@ void plotHists(bool draw2Donly=true, bool makeSRs=true, bool drawSRs=false, bool
                }
           }
           if ( process == 2 || process == 3 || process == 4 || process == 5 || process == 6 ){
+               n_bkg_tot += weight;
 	       if (weight > 0.0) histBDT_BKG->Fill(wwz_score,zh_score,weight);
                vec_WWZ[2]->Fill(wwz_score,weight);
                vec_ZH[2]->Fill(zh_score,weight);
@@ -507,6 +524,7 @@ void plotHists(bool draw2Donly=true, bool makeSRs=true, bool drawSRs=false, bool
 
 
      histBDT_WWZ->SetLineColor(kRed);
+     histBDT_WWZ->SetFillColor(kRed);
      histBDT_WWZ->SetMarkerColorAlpha(kRed,0.05);
      histBDT_WWZ->SetMarkerStyle(42);
      histBDT_WWZ->SetMarkerSize(0.1);
@@ -515,6 +533,7 @@ void plotHists(bool draw2Donly=true, bool makeSRs=true, bool drawSRs=false, bool
      vec_WWZ[0]->SetLineWidth(LW);
      vec_ZH[0]->SetLineWidth(LW);
      histBDT_ZH->SetLineColor(kBlue);
+     histBDT_ZH->SetFillColor(kBlue);
      histBDT_ZH->SetMarkerColorAlpha(kBlue,0.05);
      histBDT_ZH->SetMarkerStyle(25);
      histBDT_ZH->SetMarkerSize(0.1);
@@ -523,9 +542,11 @@ void plotHists(bool draw2Donly=true, bool makeSRs=true, bool drawSRs=false, bool
      vec_WWZ[1]->SetLineWidth(LW);
      vec_ZH[1]->SetLineWidth(LW);
      histBDT_BKG->SetLineColor(kGreen);
-     histBDT_BKG->SetMarkerColorAlpha(kGreen,0.05);
+     histBDT_BKG->SetFillColor(kGreen);
+     //histBDT_BKG->SetMarkerColorAlpha(kGreen,0.5);
+     histBDT_BKG->SetMarkerColor(kGreen);
      histBDT_BKG->SetMarkerStyle(24);
-     histBDT_BKG->SetMarkerSize(0.1);
+     histBDT_BKG->SetMarkerSize(0.4);
      vec_WWZ[2]->SetLineColor(kOrange);
      vec_ZH[2]->SetLineColor(kOrange);
      vec_WWZ[2]->SetLineWidth(LW);
@@ -625,14 +646,43 @@ void plotHists(bool draw2Donly=true, bool makeSRs=true, bool drawSRs=false, bool
          ////histBDT_ZH->Draw("cont5 same");
          ////histBDT_BKG->Draw("cont5 same");
          cs3->cd();
-         TLine* SR1_L1 = new TLine(0.9,0.8,1.0,0.8);
-         TLine* SR1_L2 = new TLine(0.9,0.8,0.9,1.0);
-         TLine* SR2_L1 = new TLine(0.9,-0.6,0.9,0.8);
-         TLine* SR2_L2 = new TLine(0.9,-0.6,1.0,-0.6);
-         TLine* SR3_L1 = new TLine(0.7,0.85,0.7,1.0);
-         TLine* SR3_L2 = new TLine(0.7,0.85,0.9,0.85);
-         TLine* SR4_L1 = new TLine(0.6,0.85,0.6,1.0);
-         TLine* SR4_L2 = new TLine(0.6,0.85,0.7,0.85);
+         TLine* SR1_L1 = new TLine(-1.0,0.8,1.0,0.8);
+         TLine* SR2_L1 = new TLine(0.5,0.8,0.5,1.0);
+         TLine* SR3_L1 = new TLine(0.8,0.8,0.8,-0.5);
+         TLine* SR4_L1 = new TLine(0.5,-0.5,1.0,-0.5);
+         TLine* SR4_L2 = new TLine(0.5,-0.5,0.5,-1.0);
+         TLine* SR5_L1 = new TLine(-1.0,0.0,0.8,0.0);
+         TLine* SR6_L1 = new TLine(0.0,-1.0,0.0,0.8);
+
+         TPaveText *SR1 = new TPaveText(0.7,0.85,0.9,0.95,"");
+         SR1->SetTextSize(0.02);
+         SR1->SetFillColor(0);
+         SR1->AddText("SR1");
+	 TPaveText *SR2 = new TPaveText(-0.1,0.85,0.0,0.95,"");
+         SR2->SetTextSize(0.02);
+         SR2->SetFillColor(0);
+         SR2->AddText("SR2");
+	 TPaveText *SR3 = new TPaveText(0.90,0.0,1.0,0.1,"");
+         SR3->SetTextSize(0.02);
+         SR3->SetFillColor(0);
+         SR3->AddText("SR3"); 
+         TPaveText *SR4 = new TPaveText(0.7,-0.9,0.9,-0.8,"");
+         SR4->SetTextSize(0.02);
+         SR4->SetFillColor(0);
+         SR4->AddText("SR4");
+	 TPaveText *SR5 = new TPaveText(-0.5,0.2,-0.4,0.3,"");
+         SR5->SetTextSize(0.02);
+         SR5->SetFillColor(0);
+         SR5->AddText("SR5");
+         TPaveText *SR6 = new TPaveText(0.3,0.2,0.4,0.3,"");
+         SR6->SetTextSize(0.02);
+         SR6->SetFillColor(0);
+         SR6->AddText("SR6");
+         TPaveText *SR7 = new TPaveText(0.2,-0.3,0.3,-0.2,"");
+         SR7->SetTextSize(0.02);
+         SR7->SetFillColor(0);
+         SR7->AddText("SR7"); 
+
          histBDT_WWZ->SetStats(0);
          histBDT_WWZ->Draw("SCAT");
          histBDT_WWZ->GetXaxis()->SetTitle("NonResonant WWZ MVA score");
@@ -644,21 +694,26 @@ void plotHists(bool draw2Donly=true, bool makeSRs=true, bool drawSRs=false, bool
 
          if ( drawSRs ){
 	      SR1_L1->SetLineWidth(3);
-              SR1_L2->SetLineWidth(3);
               SR2_L1->SetLineWidth(3);
-              SR2_L2->SetLineWidth(3);
               SR3_L1->SetLineWidth(3);
-              SR3_L2->SetLineWidth(3);
               SR4_L1->SetLineWidth(3);
               SR4_L2->SetLineWidth(3);
+	      SR5_L1->SetLineWidth(3); 
+	      SR6_L1->SetLineWidth(3);
 	      SR1_L1->Draw();
-	      SR1_L2->Draw();
 	      SR2_L1->Draw();
-	      SR2_L2->Draw();
 	      SR3_L1->Draw();
-              SR3_L2->Draw();
               SR4_L1->Draw();
               SR4_L2->Draw();
+	      SR5_L1->Draw(); 
+              SR6_L1->Draw();
+              SR1->Draw();
+              SR2->Draw();
+              SR3->Draw();
+              SR4->Draw();
+              SR5->Draw();
+              SR6->Draw();
+              SR7->Draw();
 	      h += "_SRs";
 	 }
          cs3->Print("MVAPlots/WWZ_ZH_2D_scores"+h+".png");
@@ -758,6 +813,17 @@ void plotHists(bool draw2Donly=true, bool makeSRs=true, bool drawSRs=false, bool
          std::cout << "VVV: "   << c7_vvv     << "+/-" << std::sqrt(c7_vvv_error) << " events" << std::endl;
          std::cout << "Other: " << c7_other   << "+/-" << std::sqrt(c7_other_error) << " events" << std::endl;
          std::cout << "=============================================" << std::endl;
+         std::cout << "TOTALS" << std::endl;
+         std::cout << "---------------------------------------------" << std::endl;
+         std::cout << "WWZ TR Events = " << n_wwz_tot << std::endl;
+         std::cout << "WWZ SR Events = " << c1_wwz+c2_wwz+c3_wwz+c4_wwz+c5_wwz+c6_wwz+c7_wwz << std::endl;
+         std::cout << "<><><><><><><><><><><><><><><><><><><><" << std::endl;
+         std::cout << "ZH TR Events = " << n_zh_tot << std::endl;
+         std::cout << "ZH SR Events = " << c1_zh+c2_zh+c3_zh+c4_zh+c5_zh+c6_zh+c7_zh << std::endl;
+         std::cout << "<><><><><><><><><><><><><><><><><><><><" << std::endl;
+         std::cout << "BKG TR Events = " << n_bkg_tot << std::endl;
+         std::cout << "BKG SR Events = " << c1_bkg+c2_bkg+c3_bkg+c4_bkg+c5_bkg+c6_bkg+c7_bkg << std::endl;
+         std::cout << "<><><><><><><><><><><><><><><><><><><><" << std::endl;
          
          TH1F* h_SR_wwz   = new TH1F("MVA SR Bins (WWZ)","MVA SR Bins (WWZ)",7,0,7);
          TH1F* h_SR_zh    = new TH1F("MVA SR Bins (ZH)","MVA SR Bins (ZH)",7,0,7);
@@ -857,7 +923,7 @@ void plotHists(bool draw2Donly=true, bool makeSRs=true, bool drawSRs=false, bool
          hs_SR_bkg->Add(h_SR_other);
          hs_SR_bkg->Add(h_SR_vvv);
 
-         TLegend* legendSR = new TLegend(0.60,0.60,0.90,0.90,"","NDC");
+         TLegend* legendSR = new TLegend(0.80,0.60,0.90,0.90,"","NDC");
          legendSR->SetBorderSize(0);
          legendSR->SetTextFont(43);
          legendSR->SetTextAlign(12);
@@ -878,7 +944,7 @@ void plotHists(bool draw2Donly=true, bool makeSRs=true, bool drawSRs=false, bool
 
          TCanvas *cSR = new TCanvas("cSR","cSR",10,10,1400,900);
          cSR->cd();
- 	 hs_SR_bkg->SetMaximum(18.);
+ 	 hs_SR_bkg->SetMaximum(10.);
 	 hs_SR_bkg->SetMinimum(0.);
 	 hs_SR_bkg->Draw();
 	 //h_SR_wwz->GetYaxis()->SetRangeUser(0.,3.);
@@ -938,13 +1004,13 @@ void plotHists(bool draw2Donly=true, bool makeSRs=true, bool drawSRs=false, bool
 	 texfile << "\\hline\\hline" << "\n";
 	 texfile << "\\multirow{2}{*}{MVA SR Bin} & \\multicolumn{3}{c}{Summary} & \\multicolumn{6}{c}{Composition of $\\Sigma$(bkgds)} \\\\ \\cline{2-4}\\cline{5-10}" << "\n";
 	 texfile << "      & $\\Sigma$(bkgds) & NonResWWZ & ZHWWZ & ZZ & ttZ & tWZ & WZ & VVV & Other \\\\ \\hline" << "\n";
-	 texfile << "      SR 1 & \\textcolor{red}{" << c1_bkg << " $\\pm$ " << c1_bkg_error << " } & \\textcolor{blue}{" << c1_wwz << " $\\pm$ " << c1_wwz_error << " } & \\textcolor{blue}{" << c1_zh << " $\\pm$ " << c1_zh_error << " } & " << c1_zz << " $\\pm$ " << c1_zz_error << " & " << c1_ttz << " $\\pm$ " << c1_ttz_error << " & " << c1_twz << " $\\pm$ " << c1_twz_error << " & " << c1_wz << " $\\pm$ " << c1_wz_error << " & " << c1_vvv << " $\\pm$ " << c1_vvv_error << " & " << c1_other << " $\\pm$ " << c1_other_error << " \\\\ " << "\n";
-         texfile << "      SR 2 & \\textcolor{red}{" << c2_bkg << " $\\pm$ " << c2_bkg_error << " } & \\textcolor{blue}{" << c2_wwz << " $\\pm$ " << c2_wwz_error << " } & \\textcolor{blue}{" << c2_zh << " $\\pm$ " << c2_zh_error << " } & " << c2_zz << " $\\pm$ " << c2_zz_error << " & " << c2_ttz << " $\\pm$ " << c2_ttz_error << " & " << c2_twz << " $\\pm$ " << c2_twz_error << " & " << c2_wz << " $\\pm$ " << c2_wz_error << " & " << c2_vvv << " $\\pm$ " << c2_vvv_error << " & " << c2_other << " $\\pm$ " << c2_other_error << " \\\\ " << "\n";
-         texfile << "      SR 3 & \\textcolor{red}{" << c3_bkg << " $\\pm$ " << c3_bkg_error << " } & \\textcolor{blue}{" << c3_wwz << " $\\pm$ " << c3_wwz_error << " } & \\textcolor{blue}{" << c3_zh << " $\\pm$ " << c3_zh_error << " } & " << c3_zz << " $\\pm$ " << c3_zz_error << " & " << c3_ttz << " $\\pm$ " << c3_ttz_error << " & " << c3_twz << " $\\pm$ " << c3_twz_error << " & " << c3_wz << " $\\pm$ " << c3_wz_error << " & " << c3_vvv << " $\\pm$ " << c3_vvv_error << " & " << c3_other << " $\\pm$ " << c3_other_error << " \\\\ " << "\n";
-	 texfile << "      SR 4 & \\textcolor{red}{" << c4_bkg << " $\\pm$ " << c4_bkg_error << " } & \\textcolor{blue}{" << c4_wwz << " $\\pm$ " << c4_wwz_error << " } & \\textcolor{blue}{" << c4_zh << " $\\pm$ " << c4_zh_error << " } & " << c4_zz << " $\\pm$ " << c4_zz_error << " & " << c4_ttz << " $\\pm$ " << c4_ttz_error << " & " << c4_twz << " $\\pm$ " << c4_twz_error << " & " << c4_wz << " $\\pm$ " << c4_wz_error << " & " << c4_vvv << " $\\pm$ " << c4_vvv_error << " & " << c4_other << " $\\pm$ " << c4_other_error << " \\\\ " << "\n";
-	 texfile << "      SR 5 & \\textcolor{red}{" << c5_bkg << " $\\pm$ " << c5_bkg_error << " } & \\textcolor{blue}{" << c5_wwz << " $\\pm$ " << c5_wwz_error << " } & \\textcolor{blue}{" << c5_zh << " $\\pm$ " << c5_zh_error << " } & " << c5_zz << " $\\pm$ " << c5_zz_error << " & " << c5_ttz << " $\\pm$ " << c5_ttz_error << " & " << c5_twz << " $\\pm$ " << c5_twz_error << " & " << c5_wz << " $\\pm$ " << c5_wz_error << " & " << c5_vvv << " $\\pm$ " << c5_vvv_error << " & " << c5_other << " $\\pm$ " << c5_other_error << " \\\\ " << "\n";
-	 texfile << "      SR 6 & \\textcolor{red}{" << c6_bkg << " $\\pm$ " << c6_bkg_error << " } & \\textcolor{blue}{" << c6_wwz << " $\\pm$ " << c6_wwz_error << " } & \\textcolor{blue}{" << c6_zh << " $\\pm$ " << c6_zh_error << " } & " << c6_zz << " $\\pm$ " << c6_zz_error << " & " << c6_ttz << " $\\pm$ " << c6_ttz_error << " & " << c6_twz << " $\\pm$ " << c6_twz_error << " & " << c6_wz << " $\\pm$ " << c6_wz_error << " & " << c6_vvv << " $\\pm$ " << c6_vvv_error << " & " << c6_other << " $\\pm$ " << c6_other_error << " \\\\ " << "\n";
-	 texfile << "      SR 7 & \\textcolor{red}{" << c7_bkg << " $\\pm$ " << c7_bkg_error << " } & \\textcolor{blue}{" << c7_wwz << " $\\pm$ " << c7_wwz_error << " } & \\textcolor{blue}{" << c7_zh << " $\\pm$ " << c7_zh_error << " } & " << c7_zz << " $\\pm$ " << c7_zz_error << " & " << c7_ttz << " $\\pm$ " << c7_ttz_error << " & " << c7_twz << " $\\pm$ " << c7_twz_error << " & " << c7_wz << " $\\pm$ " << c7_wz_error << " & " << c7_vvv << " $\\pm$ " << c7_vvv_error << " & " << c7_other << " $\\pm$ " << c7_other_error << " \\\\ " << "\n";
+	 texfile << "      SR 1 & \\textcolor{red}{" << c1_bkg << " $\\pm$ " << std::sqrt(c1_bkg_error) << " } & \\textcolor{blue}{" << c1_wwz << " $\\pm$ " << std::sqrt(c1_wwz_error) << " } & \\textcolor{blue}{" << c1_zh << " $\\pm$ " << std::sqrt(c1_zh_error) << " } & " << c1_zz << " $\\pm$ " << std::sqrt(c1_zz_error) << " & " << c1_ttz << " $\\pm$ " << std::sqrt(c1_ttz_error) << " & " << c1_twz << " $\\pm$ " << std::sqrt(c1_twz_error) << " & " << c1_wz << " $\\pm$ " << std::sqrt(c1_wz_error) << " & " << c1_vvv << " $\\pm$ " << std::sqrt(c1_vvv_error) << " & " << c1_other << " $\\pm$ " << std::sqrt(c1_other_error) << " \\\\ " << "\n";
+         texfile << "      SR 2 & \\textcolor{red}{" << c2_bkg << " $\\pm$ " << std::sqrt(c2_bkg_error) << " } & \\textcolor{blue}{" << c2_wwz << " $\\pm$ " << std::sqrt(c2_wwz_error) << " } & \\textcolor{blue}{" << c2_zh << " $\\pm$ " << std::sqrt(c2_zh_error) << " } & " << c2_zz << " $\\pm$ " << std::sqrt(c2_zz_error) << " & " << c2_ttz << " $\\pm$ " << std::sqrt(c2_ttz_error) << " & " << c2_twz << " $\\pm$ " << std::sqrt(c2_twz_error) << " & " << c2_wz << " $\\pm$ " << std::sqrt(c2_wz_error) << " & " << c2_vvv << " $\\pm$ " << std::sqrt(c2_vvv_error) << " & " << c2_other << " $\\pm$ " << std::sqrt(c2_other_error) << " \\\\ " << "\n";
+         texfile << "      SR 3 & \\textcolor{red}{" << c3_bkg << " $\\pm$ " << std::sqrt(c3_bkg_error) << " } & \\textcolor{blue}{" << c3_wwz << " $\\pm$ " << std::sqrt(c3_wwz_error) << " } & \\textcolor{blue}{" << c3_zh << " $\\pm$ " << std::sqrt(c3_zh_error) << " } & " << c3_zz << " $\\pm$ " << std::sqrt(c3_zz_error) << " & " << c3_ttz << " $\\pm$ " << std::sqrt(c3_ttz_error) << " & " << c3_twz << " $\\pm$ " << std::sqrt(c3_twz_error) << " & " << c3_wz << " $\\pm$ " << std::sqrt(c3_wz_error) << " & " << c3_vvv << " $\\pm$ " << std::sqrt(c3_vvv_error) << " & " << c3_other << " $\\pm$ " << std::sqrt(c3_other_error) << " \\\\ " << "\n";
+	 texfile << "      SR 4 & \\textcolor{red}{" << c4_bkg << " $\\pm$ " << std::sqrt(c4_bkg_error) << " } & \\textcolor{blue}{" << c4_wwz << " $\\pm$ " << std::sqrt(c4_wwz_error) << " } & \\textcolor{blue}{" << c4_zh << " $\\pm$ " << std::sqrt(c4_zh_error) << " } & " << c4_zz << " $\\pm$ " << std::sqrt(c4_zz_error) << " & " << c4_ttz << " $\\pm$ " << std::sqrt(c4_ttz_error) << " & " << c4_twz << " $\\pm$ " << std::sqrt(c4_twz_error) << " & " << c4_wz << " $\\pm$ " << std::sqrt(c4_wz_error) << " & " << c4_vvv << " $\\pm$ " << std::sqrt(c4_vvv_error) << " & " << c4_other << " $\\pm$ " << std::sqrt(c4_other_error) << " \\\\ " << "\n";
+	 texfile << "      SR 5 & \\textcolor{red}{" << c5_bkg << " $\\pm$ " << std::sqrt(c5_bkg_error) << " } & \\textcolor{blue}{" << c5_wwz << " $\\pm$ " << std::sqrt(c5_wwz_error) << " } & \\textcolor{blue}{" << c5_zh << " $\\pm$ " << std::sqrt(c5_zh_error) << " } & " << c5_zz << " $\\pm$ " << std::sqrt(c5_zz_error) << " & " << c5_ttz << " $\\pm$ " << std::sqrt(c5_ttz_error) << " & " << c5_twz << " $\\pm$ " << std::sqrt(c5_twz_error) << " & " << c5_wz << " $\\pm$ " << std::sqrt(c5_wz_error) << " & " << c5_vvv << " $\\pm$ " << std::sqrt(c5_vvv_error) << " & " << c5_other << " $\\pm$ " << std::sqrt(c5_other_error) << " \\\\ " << "\n";
+	 texfile << "      SR 6 & \\textcolor{red}{" << c6_bkg << " $\\pm$ " << std::sqrt(c6_bkg_error) << " } & \\textcolor{blue}{" << c6_wwz << " $\\pm$ " << std::sqrt(c6_wwz_error) << " } & \\textcolor{blue}{" << c6_zh << " $\\pm$ " << std::sqrt(c6_zh_error) << " } & " << c6_zz << " $\\pm$ " << std::sqrt(c6_zz_error) << " & " << c6_ttz << " $\\pm$ " << std::sqrt(c6_ttz_error) << " & " << c6_twz << " $\\pm$ " << std::sqrt(c6_twz_error) << " & " << c6_wz << " $\\pm$ " << std::sqrt(c6_wz_error) << " & " << c6_vvv << " $\\pm$ " << std::sqrt(c6_vvv_error) << " & " << c6_other << " $\\pm$ " << std::sqrt(c6_other_error) << " \\\\ " << "\n";
+	 texfile << "      SR 7 & \\textcolor{red}{" << c7_bkg << " $\\pm$ " << std::sqrt(c7_bkg_error) << " } & \\textcolor{blue}{" << c7_wwz << " $\\pm$ " << std::sqrt(c7_wwz_error) << " } & \\textcolor{blue}{" << c7_zh << " $\\pm$ " << std::sqrt(c7_zh_error) << " } & " << c7_zz << " $\\pm$ " << std::sqrt(c7_zz_error) << " & " << c7_ttz << " $\\pm$ " << std::sqrt(c7_ttz_error) << " & " << c7_twz << " $\\pm$ " << std::sqrt(c7_twz_error) << " & " << c7_wz << " $\\pm$ " << std::sqrt(c7_wz_error) << " & " << c7_vvv << " $\\pm$ " << std::sqrt(c7_vvv_error) << " & " << c7_other << " $\\pm$ " << std::sqrt(c7_other_error) << " \\\\ " << "\n";
 	 texfile << "\\hline\\hline" << "\n";
 	 texfile << "  \\end{tabular}}" << "\n";
          texfile << "  \\caption{Yields in the 4-lepton Same-Flavor MVA signal regions}" << "\n";

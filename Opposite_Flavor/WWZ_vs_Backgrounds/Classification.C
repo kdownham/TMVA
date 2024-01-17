@@ -40,22 +40,22 @@ int Classification(TString weightName){
     std::map<std::string,int> Use;
 
     // Boosted decision trees
-    Use["BDT"]              = 0; 
-    Use["BDT_T200"]         = 0; 
-    Use["BDT_T400"]         = 0; 
-    Use["BDTG_D2"]          = 0; 
-    Use["BDTG_T400"]        = 0; 
-    Use["BDTG_T400_LR0p5"]  = 0; 
-    Use["BDTG_LR0p1"]       = 0; 
-    Use["BDTG_T200"]        = 0; 
-    Use["BDTG"]		    = 0;
-    Use["BDTG_LR0p1_D2"]    = 0;
-    Use["BDTG_D1"]          = 0;
-    Use["BDTG_LR0p1_D1"]    = 0;
+    Use["BDT"]              = 1; 
+    Use["BDT_T200"]         = 1; 
+    Use["BDT_T400"]         = 1; 
+    Use["BDTG_D2"]          = 1; 
+    Use["BDTG_T400"]        = 1; 
+    Use["BDTG_T400_LR0p5"]  = 1; 
+    Use["BDTG_LR0p1"]       = 1; 
+    Use["BDTG_T200"]        = 1; 
+    Use["BDTG"]		    = 1;
+    Use["BDTG_LR0p1_D2"]    = 1;
+    Use["BDTG_D1"]          = 1;
+    Use["BDTG_LR0p1_D1"]    = 1;
     Use["BDTG_T400_LR0p1_D2"] = 1;
-    Use["BDTG_T400_LR0p1_D1"] = 0;
-    Use["BDTG_LR0p1_D2_NS10"]    = 0;
-    Use["BDTG_LR0p1_D2_NS1"]    = 0;
+    Use["BDTG_T400_LR0p1_D1"] = 1;
+    Use["BDTG_LR0p1_D2_NS10"]    = 1;
+    Use["BDTG_LR0p1_D2_NS1"]    = 1;
     // TODO: create other BDT options with different hyperparameter options
     //=====================================================================
     // 
@@ -81,7 +81,7 @@ int Classification(TString weightName){
     
     // Read the training and test data
     
-    TString dir = "/home/users/kdownham/Triboson/VVVNanoLooper/analysis/output_090123_metFix/Run2/";
+    TString dir = "/home/users/kdownham/Triboson/VVVNanoLooper/analysis/output_010124_BDTVars/Run2/";
 
     TFile *input_signal(0);
     TString fname_signal = dir+"NonResWWZ.root";
@@ -120,21 +120,37 @@ int Classification(TString weightName){
     // Specify the input variables that will be used for the MVA training
 
     dataloader->AddVariable("m_ll", "m_{ll}", "GeV", 'F');
+    dataloader->AddVariable("m_4l", "m_{4l}", "GeV", 'F');
     dataloader->AddVariable("dPhi_4Lep_MET", "#Delta#phi(4Lep,p_{T}^{miss})", "", 'F');
-    dataloader->AddVariable("dPhi_Zcand_MET", "#Delta#phi(Zcands,p_{T}^{miss})", "", 'F');
     dataloader->AddVariable("dPhi_WW_MET", "#Delta#phi(Wcands,p_{T}^{miss})", "", 'F');
+    dataloader->AddVariable("dPhi_W1_MET", "#Delta#phi(l^{W1},p_{T}^{miss})", "", 'F');
+    dataloader->AddVariable("dPhi_W2_MET", "#Delta#phi(l^{W2},p_{T}^{miss})", "", 'F');
     dataloader->AddVariable("dR_Wcands", "#Delta R(l^{W1},l^{W2})", "", 'F');
     dataloader->AddVariable("dR_Zcands", "#Delta R(l^{Z1},l^{Z2})", "", 'F');
     dataloader->AddVariable("dR_WW_Z", "#Delta R(Wcands,Zcands)", "", 'F'); 
     dataloader->AddVariable("MET", "p_{T}^{miss}", "GeV", 'F');
     dataloader->AddVariable("MT2", "M_{T2}", "GeV", 'F');
     dataloader->AddVariable("Pt4l", "p_{T}^{4l}", "GeV", 'F');
-    dataloader->AddVariable("STLepHad", "#Sigma_{lep,had} p_{T}", "GeV", 'F');
+    dataloader->AddVariable("HT", "H_{T}", "GeV", 'F');
     dataloader->AddVariable("STLep", "#Sigma_{lep,MET} p_{T}", "GeV", 'F'); 
     dataloader->AddVariable("leading_Zcand_pt", "p_{T}^{Z1}", "GeV", 'F');
     dataloader->AddVariable("subleading_Zcand_pt", "p_{T}^{Z2}", "GeV", 'F');
     dataloader->AddVariable("leading_Wcand_pt", "p_{T}^{W1}", "GeV", 'F');
     dataloader->AddVariable("subleading_Wcand_pt", "p_{T}^{W2}", "GeV", 'F');
+    dataloader->AddVariable("njets", "N_{jets}", "", 'F');
+    dataloader->AddVariable("cos_helicity_X", "cos(#theta_{X})", "", 'F');
+    dataloader->AddVariable("MT_leading_Wcand", "M_{T}^{W1}", "GeV", 'F');
+    dataloader->AddVariable("MT_subleading_Wcand", "M_{T}^{W2}", "GeV", 'F');
+    dataloader->AddVariable("MT_Wcands", "M_{T}^{Wcands}", "GeV", 'F');
+    dataloader->AddVariable("MT_4Lep", "M_{T}^{4Lep}", "GeV", 'F');
+    dataloader->AddVariable("leading_jet_DeepFlav", "Leading Jet DeepFlav Score", "", 'F');
+    dataloader->AddVariable("min_dR_W1_jet", "min(#Delta R(l^{W1},j))", "", 'F');
+    dataloader->AddVariable("min_dR_W2_jet", "min(#Delta R(l^{W2},j))", "", 'F');
+
+    // Specify the spectator variables, which won't be used in the training
+    dataloader->AddSpectator("dPhi_Zcand_MET", "#Delta#phi(4Lep,p_{T}^{miss})", "", 'F');
+    dataloader->AddSpectator("leading_jet_pt", "leading jet p_{T}", "GeV", 'F');    
+    dataloader->AddSpectator("subleading_jet_pt", "subleading jet p_{T}", "GeV", 'F');
 
     Double_t signalWeight = 1.0;
     Double_t bkgdWeight = 1.0;
@@ -177,7 +193,7 @@ int Classification(TString weightName){
     // =============================================================================================
     // This is where you can specify the hyperparameters for the different methods you want to train
     // =============================================================================================
-    if (Use["BDT"]) // Adaptive Boost
+    if (Use["BDT"])
         factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDT",
                            "!H:!V:NTrees=800:MinNodeSize=5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:SeparationType=SDivSqrtSPlusB:nCuts=20:NegWeightTreatment=IgnoreNegWeightsInTraining" );
 

@@ -40,21 +40,22 @@ int Classification(TString weightName){
     std::map<std::string,int> Use;
 
     // Boosted decision trees
-    //Use["BDT"]             = 1; // uses Adaptive Boost (default values for all parameters)
-    ////Use["BDT_opt"]         = 1; // uses Adaptive Boost (optimal values for all parameters)
-    //Use["BDT_T200"]        = 1; // uses Adaptive Boost (200 trees, default depth, node size, learning rate)
-    //Use["BDT_T400"]        = 1; // uses Adaptive Boost (400 trees, default depth, node size, learning rate)
-    ////Use["BDT_T800"]        = 1; // uses Adaptive Boost (800 trees, default depth, node size, learning rate)
-    //Use["BDT_D2"]          = 1; // uses Adaptive Boost (Tree depth = 2, default N_trees, node size, learning rate)
-    ////Use["BDT_D3"]          = 1; // uses Adaptive Boost (Tree depth = 3, default N_trees, node size, learning rate)
-    //Use["BDT_D4"]          = 1; // uses Adaptive Boost (Tree depth = 4, default N_trees, node size, learning rate)
-    //Use["BDT_NS2p5"]       = 1; // uses Adaptive Boost (Max node size = 2.5%, default N_trees, depth, learning rate)
-    ////Use["BDT_NS5"]         = 1; // uses Adaptive Boost (Max node size = 5%, default N_trees, depth, learning rate)
-    //Use["BDT_NS10"]        = 1; // uses Adaptive Boost (Max node size = 10%, default N_trees, depth, learning rate)
-    //Use["BDT_L3"]          = 1; // uses Adaptive Boost (Learning rate = 0.3, default N_trees, node size, depth)
-    //Use["BDT_L5"]          = 1; // uses Adaptive Boost (Learning rate = 0.5, default N_trees, node size, depth)
-    //Use["BDT_L7"]          = 1; // uses Adaptive Boost (Learning rate = 0.7, default N_trees, node size, depth)
-    Use["BDTG_T400_LR0p1_D2"] = 1; // uses Gradient Boost
+    Use["BDT"]              = 1;
+    Use["BDT_T200"]         = 1;
+    Use["BDT_T400"]         = 1;
+    Use["BDTG_D2"]          = 1;
+    Use["BDTG_T400"]        = 1;
+    Use["BDTG_T400_LR0p5"]  = 1;
+    Use["BDTG_LR0p1"]       = 1;
+    Use["BDTG_T200"]        = 1;
+    Use["BDTG"]             = 1;
+    Use["BDTG_LR0p1_D2"]    = 1;
+    Use["BDTG_D1"]          = 1;
+    Use["BDTG_LR0p1_D1"]    = 1;
+    Use["BDTG_T400_LR0p1_D2"] = 1;
+    Use["BDTG_T400_LR0p1_D1"] = 1;
+    Use["BDTG_LR0p1_D2_NS10"]    = 1;
+    Use["BDTG_LR0p1_D2_NS1"]    = 1;
     // TODO: create other BDT options with different hyperparameter options
     //=====================================================================
     // 
@@ -80,7 +81,7 @@ int Classification(TString weightName){
     
     // Read the training and test data
     
-    TString dir = "/home/users/kdownham/Triboson/VVVNanoLooper/analysis/output_090123_metFix/Run2/";
+    TString dir = "/home/users/kdownham/Triboson/VVVNanoLooper/analysis/output_010124_BDTVars/Run2/";
 
     TFile *input_signal(0);
     TString fname_signal = dir+"NonResWWZ.root";
@@ -119,21 +120,37 @@ int Classification(TString weightName){
     // Specify the input variables that will be used for the MVA training
 
     dataloader->AddVariable("m_ll", "m_{ll}", "GeV", 'F');
+    dataloader->AddVariable("m_4l", "m_{4l}", "GeV", 'F');
     dataloader->AddVariable("dPhi_4Lep_MET", "#Delta#phi(4Lep,p_{T}^{miss})", "", 'F');
     dataloader->AddVariable("dPhi_Zcand_MET", "#Delta#phi(Zcands,p_{T}^{miss})", "", 'F');
     dataloader->AddVariable("dPhi_WW_MET", "#Delta#phi(Wcands,p_{T}^{miss})", "", 'F');
+    dataloader->AddVariable("dPhi_W1_MET", "#Delta#phi(l^{W1},p_{T}^{miss})", "", 'F');
+    dataloader->AddVariable("dPhi_W2_MET", "#Delta#phi(l^{W2},p_{T}^{miss})", "", 'F');
     dataloader->AddVariable("dR_Wcands", "#Delta R(l^{W1},l^{W2})", "", 'F');
     dataloader->AddVariable("dR_Zcands", "#Delta R(l^{Z1},l^{Z2})", "", 'F');
     dataloader->AddVariable("dR_WW_Z", "#Delta R(Wcands,Zcands)", "", 'F');
     dataloader->AddVariable("MET", "p_{T}^{miss}", "GeV", 'F');
     dataloader->AddVariable("MT2", "M_{T2}", "GeV", 'F');
     dataloader->AddVariable("Pt4l", "p_{T}^{4l}", "GeV", 'F');
-    dataloader->AddVariable("STLepHad", "#Sigma_{lep,had} p_{T}", "GeV", 'F');
+    dataloader->AddVariable("HT", "H_{T}", "GeV", 'F');
     dataloader->AddVariable("STLep", "#Sigma_{lep,MET} p_{T}", "GeV", 'F');
     dataloader->AddVariable("leading_Zcand_pt", "p_{T}^{Z1}", "GeV", 'F');
     dataloader->AddVariable("subleading_Zcand_pt", "p_{T}^{Z2}", "GeV", 'F');
     dataloader->AddVariable("leading_Wcand_pt", "p_{T}^{W1}", "GeV", 'F');
     dataloader->AddVariable("subleading_Wcand_pt", "p_{T}^{W2}", "GeV", 'F');
+    dataloader->AddVariable("njets", "N_{jets}", "", 'F');
+    dataloader->AddVariable("cos_helicity_X", "cos(#theta_{X})", "", 'F');
+    dataloader->AddVariable("MT_leading_Wcand", "M_{T}^{W1}", "GeV", 'F');
+    dataloader->AddVariable("MT_subleading_Wcand", "M_{T}^{W2}", "GeV", 'F');
+    dataloader->AddVariable("MT_Wcands", "M_{T}^{Wcands}", "GeV", 'F');
+    dataloader->AddVariable("MT_4Lep", "M_{T}^{4Lep}", "GeV", 'F');
+    dataloader->AddVariable("leading_jet_DeepFlav", "Leading Jet DeepFlav Score", "", 'F');
+    dataloader->AddVariable("min_dR_W1_jet", "min(#Delta R(l^{W1},j))", "", 'F');
+    dataloader->AddVariable("min_dR_W2_jet", "min(#Delta R(l^{W2},j))", "", 'F');
+
+    // Specify the spectator variables (those that won't be used in the training)
+    dataloader->AddSpectator("leading_jet_pt", "leading jet p_{T}", "GeV", 'F');
+    dataloader->AddSpectator("subleading_jet_pt", "subleading jet p_{T}", "GeV", 'F');
 
     Double_t signalWeight = 1.0;
     Double_t bkgdWeight = 1.0;
@@ -173,49 +190,70 @@ int Classification(TString weightName){
 //					  "nTrain_Signal=0:nTest_Signal=0:nTrain_Background=0:nTest_Background=0:SplitMode=Random:!V" );
 
     // Boosted Decision Trees (BDTs)
-    //if (Use["BDT"]) // Adaptive Boost
-    //    factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDT",
-    //                       "!H:!V:NTrees=800:MinNodeSize=5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:SeparationType=SDivSqrtSPlusB:nCuts=20" );
+    if (Use["BDT"])
+        factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDT",
+                           "!H:!V:NTrees=800:MinNodeSize=5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:SeparationType=SDivSqrtSPlusB:nCuts=20:NegWeightTreatment=IgnoreNegWeightsInTraining" );
 
-    ////if (Use["BDT"]) // Adaptive Boost
-    ////    factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDT",
-    ////                       "!H:!V:NTrees=800:MinNodeSize=5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:SeparationType=SDivSqrtSPlusB:nCuts=20" );
+    if (Use["BDT_T200"])
+        factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDT_T200",
+                           "!H:!V:NTrees=200:MinNodeSize=5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:SeparationType=SDivSqrtSPlusB:nCuts=20:NegWeightTreatment=IgnoreNegWeightsInTraining" );
 
-    //if (Use["BDT_T200"])
-    //    factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDT_T200",
-    //                       "!H:!V:NTrees=200:MinNodeSize=5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:SeparationType=SDivSqrtSPlusB:nCuts=20" );
+    if (Use["BDT_T400"])
+        factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDT_T400",
+                           "!H:!V:NTrees=400:MinNodeSize=5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:SeparationType=SDivSqrtSPlusB:nCuts=20:NegWeightTreatment=IgnoreNegWeightsInTraining" );
 
-    //if (Use["BDT_T400"])
-    //    factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDT_T400",
-    //                       "!H:!V:NTrees=400:MinNodeSize=5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:SeparationType=SDivSqrtSPlusB:nCuts=20" );
 
-    //if (Use["BDT_D2"])
-    //    factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDT_D2",
-    //                       "!H:!V:NTrees=800:MinNodeSize=5%:MaxDepth=2:BoostType=AdaBoost:AdaBoostBeta=0.5:SeparationType=SDivSqrtSPlusB:nCuts=20" );
+    if (Use["BDTG"])
+        factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDTG",
+                           "!H:!V:NTrees=800:MinNodeSize=5%:BoostType=Grad:nCuts=20:MaxDepth=3:SeparationType=SDivSqrtSPlusB:NegWeightTreatment=IgnoreNegWeightsInTraining" );
 
-    //if (Use["BDT_D4"])
-    //    factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDT_D4",
-    //                       "!H:!V:NTrees=800:MinNodeSize=5%:MaxDepth=4:BoostType=AdaBoost:AdaBoostBeta=0.5:SeparationType=SDivSqrtSPlusB:nCuts=20" );
+    if (Use["BDTG_D2"])
+        factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDTG_D2",
+                           "!H:!V:NTrees=800:MinNodeSize=5%:BoostType=Grad:nCuts=20:MaxDepth=2:SeparationType=SDivSqrtSPlusB:NegWeightTreatment=IgnoreNegWeightsInTraining" );
 
-    //if (Use["BDT_NS2p5"])
-    //    factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDT_NS2p5",
-    //                       "!H:!V:NTrees=800:MinNodeSize=2.5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:SeparationType=SDivSqrtSPlusB:nCuts=20" );
-   
-    //if (Use["BDT_NS10"])
-    //    factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDT_NS10",
-    //                       "!H:!V:NTrees=800:MinNodeSize=10%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:SeparationType=SDivSqrtSPlusB:nCuts=20" );
+    if (Use["BDTG_T400"])
+        factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDTG_T400",
+                           "!H:!V:NTrees=400:MinNodeSize=5%:BoostType=Grad:nCuts=20:MaxDepth=3:SeparationType=SDivSqrtSPlusB:NegWeightTreatment=IgnoreNegWeightsInTraining" );
 
-    //if (Use["BDT_L3"])
-    //    factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDT_L3",
-    //                       "!H:!V:NTrees=800:MinNodeSize=5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.3:SeparationType=SDivSqrtSPlusB:nCuts=20" );
+    if (Use["BDTG_T400_LR0p5"])
+        factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDTG_T400_LR0p5",
+                           "!H:!V:NTrees=400:MinNodeSize=5%:BoostType=Grad:Shrinkage=0.5:nCuts=20:MaxDepth=3:SeparationType=SDivSqrtSPlusB:NegWeightTreatment=IgnoreNegWeightsInTraining" );
 
-    //if (Use["BDT_L7"])
-    //    factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDT_L7",
-    //                       "!H:!V:NTrees=800:MinNodeSize=5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.7:SeparationType=SDivSqrtSPlusB:nCuts=20" );
+    if (Use["BDTG_LR0p1"])
+        factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDTG_LR0p1",
+                           "!H:!V:NTrees=800:MinNodeSize=5%:BoostType=Grad:Shrinkage=0.1:nCuts=20:MaxDepth=3:SeparationType=SDivSqrtSPlusB:NegWeightTreatment=IgnoreNegWeightsInTraining" );
 
-    if (Use["BDTG_T400_LR0p1_D2"]) // Gradient Boost
+    if (Use["BDTG_T200"])
+        factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDTG_T200",
+                           "!H:!V:NTrees=200:MinNodeSize=5%:BoostType=Grad:nCuts=20:MaxDepth=3:SeparationType=SDivSqrtSPlusB:NegWeightTreatment=IgnoreNegWeightsInTraining" );
+
+    if (Use["BDTG_LR0p1_D2"])
+        factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDTG_LR0p1_D2",
+                           "!H:!V:NTrees=800:MinNodeSize=5%:BoostType=Grad:Shrinkage=0.1:nCuts=20:MaxDepth=2:SeparationType=SDivSqrtSPlusB:NegWeightTreatment=IgnoreNegWeightsInTraining" );
+
+    if (Use["BDTG_D1"])
+        factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDTG_D1",
+                           "!H:!V:NTrees=800:MinNodeSize=5%:BoostType=Grad:nCuts=20:MaxDepth=1:SeparationType=SDivSqrtSPlusB:NegWeightTreatment=IgnoreNegWeightsInTraining" );
+
+    if (Use["BDTG_LR0p1_D1"])
+        factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDTG_LR0p1_D1",
+                           "!H:!V:NTrees=800:MinNodeSize=5%:BoostType=Grad:Shrinkage=0.1:nCuts=20:MaxDepth=1:SeparationType=SDivSqrtSPlusB:NegWeightTreatment=IgnoreNegWeightsInTraining" );
+
+    if (Use["BDTG_T400_LR0p1_D2"])
         factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDTG_T400_LR0p1_D2",
                            "!H:!V:NTrees=400:MinNodeSize=5%:BoostType=Grad:Shrinkage=0.1:nCuts=20:MaxDepth=2:SeparationType=SDivSqrtSPlusB:NegWeightTreatment=IgnoreNegWeightsInTraining" );
+
+    if (Use["BDTG_T400_LR0p1_D1"])
+        factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDTG_T400_LR0p1_D1",
+                           "!H:!V:NTrees=400:MinNodeSize=5%:BoostType=Grad:Shrinkage=0.1:nCuts=20:MaxDepth=1:SeparationType=SDivSqrtSPlusB:NegWeightTreatment=IgnoreNegWeightsInTraining" );
+
+    if (Use["BDTG_LR0p1_D2_NS10"])
+        factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDTG_LR0p1_D2_NS10",
+                           "!H:!V:NTrees=800:MinNodeSize=10%:BoostType=Grad:Shrinkage=0.1:nCuts=20:MaxDepth=2:SeparationType=SDivSqrtSPlusB:NegWeightTreatment=IgnoreNegWeightsInTraining" );
+
+    if (Use["BDTG_LR0p1_D2_NS1"])
+        factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDTG_LR0p1_D2_NS1",
+                           "!H:!V:NTrees=800:MinNodeSize=1%:BoostType=Grad:Shrinkage=0.1:nCuts=20:MaxDepth=2:SeparationType=SDivSqrtSPlusB:NegWeightTreatment=IgnoreNegWeightsInTraining" );
 
     // Now I can tell the factory to train, test, and evaluate all MVA methods
     factory->TrainAllMethods();
