@@ -40,9 +40,9 @@ int Classification(TString weightName){
     std::map<std::string,int> Use;
 
     // Boosted decision trees
-    Use["BDT"]              = 1; 
-    Use["BDT_T200"]         = 1; 
-    Use["BDT_T400"]         = 1; 
+    Use["BDT"]              = 0; 
+    Use["BDT_T200"]         = 0; 
+    Use["BDT_T400"]         = 0; 
     Use["BDTG_D2"]          = 1; 
     Use["BDTG_T400"]        = 1; 
     Use["BDTG_T400_LR0p5"]  = 1; 
@@ -81,12 +81,12 @@ int Classification(TString weightName){
     
     // Read the training and test data
     
-    TString dir = "/home/users/kdownham/Triboson/VVVNanoLooper/analysis/output_010124_BDTVars/Run2/";
+    TString dir = "/home/users/kdownham/Triboson/VVVNanoLooper/analysis/output_020724_BDTUpdate/Run2/";
 
     TFile *input_signal(0);
     TString fname_signal = dir+"NonResWWZ.root";
     TFile *input_bkgd(0);
-    TString fname_bkgd = dir+"BDT_Backgrounds.root"; // This is a sum of ZZ and ttZ
+    TString fname_bkgd = dir+"BDT_Backgrounds_OF.root"; // This is a sum of ZZ, ttZ, and tWZ
 
     // Open the files for signal and background
     input_signal = TFile::Open(fname_signal);
@@ -143,7 +143,7 @@ int Classification(TString weightName){
     dataloader->AddVariable("MT_subleading_Wcand", "M_{T}^{W2}", "GeV", 'F');
     dataloader->AddVariable("MT_Wcands", "M_{T}^{Wcands}", "GeV", 'F');
     dataloader->AddVariable("MT_4Lep", "M_{T}^{4Lep}", "GeV", 'F');
-    dataloader->AddVariable("leading_jet_DeepFlav", "Leading Jet DeepFlav Score", "", 'F');
+    //dataloader->AddVariable("leading_jet_DeepFlav", "Leading Jet DeepFlav Score", "", 'F');
     dataloader->AddVariable("min_dR_W1_jet", "min(#Delta R(l^{W1},j))", "", 'F');
     dataloader->AddVariable("min_dR_W2_jet", "min(#Delta R(l^{W2},j))", "", 'F');
 
@@ -151,6 +151,7 @@ int Classification(TString weightName){
     dataloader->AddSpectator("dPhi_Zcand_MET", "#Delta#phi(4Lep,p_{T}^{miss})", "", 'F');
     dataloader->AddSpectator("leading_jet_pt", "leading jet p_{T}", "GeV", 'F');    
     dataloader->AddSpectator("subleading_jet_pt", "subleading jet p_{T}", "GeV", 'F');
+    dataloader->AddSpectator("leading_jet_DeepFlav", "Leading Jet DeepFlav Score", "", 'F');
 
     Double_t signalWeight = 1.0;
     Double_t bkgdWeight = 1.0;

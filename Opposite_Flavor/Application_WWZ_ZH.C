@@ -23,8 +23,8 @@ void Application_WWZ_ZH(){
 
      
 
-     Use_ZH["BDTG_LR0p1"]            = 1;  // Need to use the same method(s) as utilized during the training
-     Use_WWZ["BDTG_LR0p1_D2"]           = 1;  // Need to use the same method(s) as utilized during the training
+     Use_ZH["BDTG_T400_LR0p5"]       = 1;  // Need to use the same method(s) as utilized during the training
+     Use_WWZ["BDTG_LR0p1_D2_NS1"]    = 1;  // Need to use the same method(s) as utilized during the training
 
      // Define the input variables
      float m_ll;
@@ -88,16 +88,17 @@ void Application_WWZ_ZH(){
      reader_wwz->AddVariable( "MT_subleading_Wcand", &MT_subleading_Wcand );
      reader_wwz->AddVariable( "MT_Wcands", &MT_Wcands );
      reader_wwz->AddVariable( "MT_4Lep", &MT_4Lep );
-     reader_wwz->AddVariable( "leading_jet_DeepFlav", &leading_jet_DeepFlav );
+     //reader_wwz->AddVariable( "leading_jet_DeepFlav", &leading_jet_DeepFlav );
      reader_wwz->AddVariable( "min_dR_W1_jet", &min_dR_W1_jet );
      reader_wwz->AddVariable( "min_dR_W2_jet", &min_dR_W2_jet );
 
      reader_wwz->AddSpectator( "dPhi_Zcand_MET", &dPhi_Zcand_MET );
      reader_wwz->AddSpectator( "leading_jet_pt", &leading_jet_pt );
      reader_wwz->AddSpectator( "subleading_jet_pt", &subleading_jet_pt );
+     reader_wwz->AddSpectator( "leading_jet_DeepFlav", &leading_jet_DeepFlav );
 
      TString dir_1 = "WWZ_vs_Backgrounds/dataset/weights/"; // Path to your WWZ "weights" directory
-     TString prefix_1 = "010224_newVars";                  // Name of the "weight" file you want to evaluate for the WWZ signal (without the .weights.xml)
+     TString prefix_1 = "020824_newBkgd";                   // Name of the "weight" file you want to evaluate for the WWZ signal (without the .weights.xml)
      for (std::map<std::string,int>::iterator it = Use_WWZ.begin(); it != Use_WWZ.end(); it++) {
          if (it->second) {
          TString methodName = TString(it->first) + TString(" method");
@@ -132,15 +133,16 @@ void Application_WWZ_ZH(){
      reader_zh->AddVariable( "MT_subleading_Wcand", &MT_subleading_Wcand );
      reader_zh->AddVariable( "MT_Wcands", &MT_Wcands );
      reader_zh->AddVariable( "MT_4Lep", &MT_4Lep );
-     reader_zh->AddVariable( "leading_jet_DeepFlav", &leading_jet_DeepFlav );
+     //reader_zh->AddVariable( "leading_jet_DeepFlav", &leading_jet_DeepFlav );
      reader_zh->AddVariable( "min_dR_W1_jet", &min_dR_W1_jet );
      reader_zh->AddVariable( "min_dR_W2_jet", &min_dR_W2_jet );
 
      reader_zh->AddSpectator( "leading_jet_pt", &leading_jet_pt );
      reader_zh->AddSpectator( "subleading_jet_pt", &subleading_jet_pt );
+     reader_zh->AddSpectator( "leading_jet_DeepFlav", &leading_jet_DeepFlav );
 
      TString dir_2 = "ZH_vs_Backgrounds/dataset/weights/"; // Path to your ZH "weights" directory
-     TString prefix_2 = "010224_newVars";		   // Name of the "weight" file you want to evaluate for the ZH signal (without the .weights.xml)
+     TString prefix_2 = "020824_newBkgd";		   // Name of the "weight" file you want to evaluate for the ZH signal (without the .weights.xml)
      for (std::map<std::string,int>::iterator it = Use_ZH.begin(); it != Use_ZH.end(); it++) {
          if (it->second) {
          TString methodName = TString(it->first) + TString(" method");
@@ -149,7 +151,7 @@ void Application_WWZ_ZH(){
          }
      }
 
-     TString path = "/home/users/kdownham/Triboson/VVVNanoLooper/analysis/output_010124_BDTVars/Run2/";  // Path pointing towards your MC file directory
+     TString path = "/home/users/kdownham/Triboson/VVVNanoLooper/analysis/output_020724_BDTUpdate/Run2/";  // Path pointing towards your MC file directory
      std::vector<TString> files = {"NonResWWZ.root", "ZHWWZ.root", "TTZ.root", "ZZ.root", "tWZ.root", "WZ.root", "VVV.root", "Other.root"};  // Name of MC files that we want to evaluate
 
      ofstream mva_scores;
@@ -186,7 +188,7 @@ void Application_WWZ_ZH(){
           tree->SetBranchAddress( "MT_subleading_Wcand", &MT_subleading_Wcand );
           tree->SetBranchAddress( "MT_Wcands", &MT_Wcands );
           tree->SetBranchAddress( "MT_4Lep", &MT_4Lep );
-          tree->SetBranchAddress( "leading_jet_DeepFlav", &leading_jet_DeepFlav );
+          //tree->SetBranchAddress( "leading_jet_DeepFlav", &leading_jet_DeepFlav );
           tree->SetBranchAddress( "leading_jet_pt", &leading_jet_pt );
           tree->SetBranchAddress( "min_dR_W1_jet", &min_dR_W1_jet );
           tree->SetBranchAddress( "min_dR_W2_jet", &min_dR_W2_jet );    
@@ -218,7 +220,7 @@ void Application_WWZ_ZH(){
           tree1->SetBranchAddress( "MT_subleading_Wcand", &MT_subleading_Wcand );
           tree1->SetBranchAddress( "MT_Wcands", &MT_Wcands );
           tree1->SetBranchAddress( "MT_4Lep", &MT_4Lep );
-          tree1->SetBranchAddress( "leading_jet_DeepFlav", &leading_jet_DeepFlav );
+          //tree1->SetBranchAddress( "leading_jet_DeepFlav", &leading_jet_DeepFlav );
           tree1->SetBranchAddress( "min_dR_W1_jet", &min_dR_W1_jet );
           tree1->SetBranchAddress( "min_dR_W2_jet", &min_dR_W2_jet );
           tree1->SetBranchAddress( "weight", &weight);
@@ -241,8 +243,8 @@ void Application_WWZ_ZH(){
 
                tree->GetEntry(ievt);
 
-               float mva_wwz = reader_wwz->EvaluateMVA("BDTG_LR0p1_D2 method");
-               float mva_zh = reader_zh->EvaluateMVA("BDTG_LR0p1 method");
+               float mva_wwz = reader_wwz->EvaluateMVA("BDTG_LR0p1_D2_NS1 method");
+               float mva_zh = reader_zh->EvaluateMVA("BDTG_T400_LR0p5 method");
 
                mva_scores << proc << " " << mva_wwz << " " << mva_zh << " " << weight << " \n";     
 
@@ -255,8 +257,8 @@ void Application_WWZ_ZH(){
 
                tree1->GetEntry(ievt);
 
-               float mva_wwz = reader_wwz->EvaluateMVA("BDTG_LR0p1_D2 method");
-               float mva_zh = reader_zh->EvaluateMVA("BDTG_LR0p1 method");
+               float mva_wwz = reader_wwz->EvaluateMVA("BDTG_LR0p1_D2_NS1 method");
+               float mva_zh = reader_zh->EvaluateMVA("BDTG_T400_LR0p5 method");
 
                mva_scores << proc << " " << mva_wwz << " " << mva_zh << " " << weight << " \n";
 

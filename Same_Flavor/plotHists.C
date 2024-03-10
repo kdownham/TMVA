@@ -1,13 +1,13 @@
 std::vector<TH1F*> WWZ_hists(int nbin);
 std::vector<TH1F*> ZH_hists(int nbin);
 
-void plotHists(bool draw2Donly=false, bool makeSRs=false, bool drawSRs=false, bool makeDatacard=false, bool makeLatex=false){
+void plotHists(bool draw2Donly=true, bool makeSRs=true, bool drawSRs=false, bool makeDatacard=true, bool makeLatex=true){
 
      int nbin = 50;
      int LW = 5;
 
-     TString tag = "newVars_010924";
-     TString file = "mva_scores_newVars_010924.root";
+     TString tag = "newBkgd_020824";
+     TString file = "mva_scores_newBkgd_020824.root";
      TFile *f = TFile::Open(file);
 
      Int_t process;
@@ -220,13 +220,22 @@ void plotHists(bool draw2Donly=false, bool makeSRs=false, bool drawSRs=false, bo
           //bool zh_SR3 = ( !(original_SRs || wwz_SR3 || wwz_SR4 ) && ( wwz_score > 0.8 ) );
 
           // These are the NEW SRs
-          bool wwz_SR1 = ( zh_score > 0.8 && wwz_score > 0.5 );
-          bool wwz_SR2 = ( !(wwz_SR1) && zh_score > 0.8 && wwz_score > -1.0 && wwz_score < 0.5 );
-          bool zh_SR1 =  ( !(wwz_SR1 || wwz_SR2) && zh_score > -0.5 && zh_score < 0.8 && wwz_score > 0.8 );
-          bool zh_SR2 =  ( !(wwz_SR1 || wwz_SR2 || zh_SR1 ) && zh_score < -0.5 && wwz_score > 0.5 );
-          bool wwz_SR3 = ( !(wwz_SR1 || wwz_SR2 || zh_SR1 || zh_SR2) && zh_score > 0.0 && zh_score < 0.8 && wwz_score < 0.0 );
-          bool wwz_SR4 = ( !(wwz_SR1 || wwz_SR2 || zh_SR1 || zh_SR2 || wwz_SR3) && zh_score > 0.0 && zh_score < 0.8 && wwz_score > 0.0 && wwz_score < 0.8 );
-          bool zh_SR3  = ( !(wwz_SR1 || wwz_SR2 || zh_SR1 || zh_SR2 || wwz_SR3 || wwz_SR4) && zh_score < 0.0 && wwz_score > 0.0 );
+          //bool wwz_SR1 = ( zh_score > 0.8 && wwz_score > 0.5 );
+          //bool wwz_SR2 = ( !(wwz_SR1) && zh_score > 0.8 && wwz_score > -1.0 && wwz_score < 0.5 );
+          //bool zh_SR1 =  ( !(wwz_SR1 || wwz_SR2) && zh_score > -0.5 && zh_score < 0.8 && wwz_score > 0.8 );
+          //bool zh_SR2 =  ( !(wwz_SR1 || wwz_SR2 || zh_SR1 ) && zh_score < -0.5 && wwz_score > 0.5 );
+          //bool wwz_SR3 = ( !(wwz_SR1 || wwz_SR2 || zh_SR1 || zh_SR2) && zh_score > 0.0 && zh_score < 0.8 && wwz_score < 0.0 );
+          //bool wwz_SR4 = ( !(wwz_SR1 || wwz_SR2 || zh_SR1 || zh_SR2 || wwz_SR3) && zh_score > 0.0 && zh_score < 0.8 && wwz_score > 0.0 && wwz_score < 0.8 );
+          //bool zh_SR3  = ( !(wwz_SR1 || wwz_SR2 || zh_SR1 || zh_SR2 || wwz_SR3 || wwz_SR4) && zh_score < 0.0 && wwz_score > 0.0 );
+
+          // SRs for BDT v5 
+          bool wwz_SR1 = ( wwz_score > 0.8 && zh_score < -0.6 );
+          bool wwz_SR2 = ( wwz_score > 0.6 && zh_score < -0.6 && !(wwz_SR1) );
+          bool zh_SR1  = ( wwz_score > 0.8 && zh_score > 0.9 && !(wwz_SR1 || wwz_SR2) );
+          bool zh_SR2  = ( wwz_score > 0.5 && zh_score > 0.9 && !(wwz_SR1 || wwz_SR2 || zh_SR1) );
+          bool wwz_SR3 = ( wwz_score > 0.0 && zh_score < -0.8 && !(wwz_SR1 || wwz_SR2 || zh_SR1 || zh_SR2) );
+          bool wwz_SR4 = ( wwz_score > 0.0 && !(wwz_SR1 || wwz_SR2 || wwz_SR3 || zh_SR1 || zh_SR2) );
+          bool zh_SR3 = ( !(wwz_SR1 || wwz_SR2 || wwz_SR3 || zh_SR1 || zh_SR2 || wwz_SR4) );
 
 	  // Fill histograms
 	  if ( process == 0 ){
@@ -525,7 +534,7 @@ void plotHists(bool draw2Donly=false, bool makeSRs=false, bool drawSRs=false, bo
 
      histBDT_WWZ->SetLineColor(kRed);
      histBDT_WWZ->SetFillColor(kRed);
-     histBDT_WWZ->SetMarkerColorAlpha(kRed,0.05);
+     //histBDT_WWZ->SetMarkerColorAlpha(kRed,0.05);
      histBDT_WWZ->SetMarkerStyle(42);
      histBDT_WWZ->SetMarkerSize(0.1);
      vec_WWZ[0]->SetLineColor(kRed);
@@ -534,7 +543,7 @@ void plotHists(bool draw2Donly=false, bool makeSRs=false, bool drawSRs=false, bo
      vec_ZH[0]->SetLineWidth(LW);
      histBDT_ZH->SetLineColor(kBlue);
      histBDT_ZH->SetFillColor(kBlue);
-     histBDT_ZH->SetMarkerColorAlpha(kBlue,0.05);
+     //histBDT_ZH->SetMarkerColorAlpha(kBlue,0.05);
      histBDT_ZH->SetMarkerStyle(25);
      histBDT_ZH->SetMarkerSize(0.1);
      vec_WWZ[1]->SetLineColor(kBlue);
@@ -542,7 +551,7 @@ void plotHists(bool draw2Donly=false, bool makeSRs=false, bool drawSRs=false, bo
      vec_WWZ[1]->SetLineWidth(LW);
      vec_ZH[1]->SetLineWidth(LW);
      histBDT_BKG->SetLineColor(kGreen);
-     histBDT_BKG->SetFillColor(kGreen);
+     //histBDT_BKG->SetFillColor(kGreen);
      //histBDT_BKG->SetMarkerColorAlpha(kGreen,0.5);
      histBDT_BKG->SetMarkerColor(kGreen);
      histBDT_BKG->SetMarkerStyle(24);
@@ -646,66 +655,69 @@ void plotHists(bool draw2Donly=false, bool makeSRs=false, bool drawSRs=false, bo
          ////histBDT_ZH->Draw("cont5 same");
          ////histBDT_BKG->Draw("cont5 same");
          cs3->cd();
-         TLine* SR1_L1 = new TLine(-1.0,0.8,1.0,0.8);
-         TLine* SR2_L1 = new TLine(0.5,0.8,0.5,1.0);
-         TLine* SR3_L1 = new TLine(0.8,0.8,0.8,-0.5);
-         TLine* SR4_L1 = new TLine(0.5,-0.5,1.0,-0.5);
-         TLine* SR4_L2 = new TLine(0.5,-0.5,0.5,-1.0);
-         TLine* SR5_L1 = new TLine(-1.0,0.0,0.8,0.0);
-         TLine* SR6_L1 = new TLine(0.0,-1.0,0.0,0.8);
+         TLine* SR1_L1 = new TLine(0.6,-0.6,1.0,-0.6);
+         TLine* SR1_L2 = new TLine(0.8,-1.0,0.8,-0.6);
+         TLine* SR2_L1 = new TLine(0.6,-1.0,0.6,-0.6);
+         TLine* SR3_L1 = new TLine(0.5,0.9,1.0,0.9);
+         TLine* SR3_L2 = new TLine(0.8,0.9,0.8,1.0);
+         TLine* SR4_L1 = new TLine(0.5,0.9,0.5,1.0);
+         TLine* SR5_L1 = new TLine(0.0,-0.8,0.6,-0.8);
+         TLine* SR6_L1 = new TLine(0.0,-1.0,0.0,1.0);
 
-         TPaveText *SR1 = new TPaveText(0.7,0.85,0.9,0.95,"");
+         TPaveText *SR1 = new TPaveText(0.85,-0.75,0.95,-0.85,"");
          SR1->SetTextSize(0.02);
          SR1->SetFillColor(0);
          SR1->AddText("SR1");
-	 TPaveText *SR2 = new TPaveText(-0.1,0.85,0.0,0.95,"");
+	 TPaveText *SR2 = new TPaveText(0.65,-0.75,0.75,-0.85,"");
          SR2->SetTextSize(0.02);
          SR2->SetFillColor(0);
          SR2->AddText("SR2");
-	 TPaveText *SR3 = new TPaveText(0.90,0.0,1.0,0.1,"");
+	 TPaveText *SR3 = new TPaveText(0.85,0.95,0.95,1.05,"");
          SR3->SetTextSize(0.02);
          SR3->SetFillColor(0);
          SR3->AddText("SR3"); 
-         TPaveText *SR4 = new TPaveText(0.7,-0.9,0.9,-0.8,"");
+         TPaveText *SR4 = new TPaveText(0.55,0.95,0.65,1.05,"");
          SR4->SetTextSize(0.02);
          SR4->SetFillColor(0);
          SR4->AddText("SR4");
-	 TPaveText *SR5 = new TPaveText(-0.5,0.2,-0.4,0.3,"");
+	 TPaveText *SR5 = new TPaveText(0.2,-0.95,0.4,-0.85,"");
          SR5->SetTextSize(0.02);
          SR5->SetFillColor(0);
          SR5->AddText("SR5");
-         TPaveText *SR6 = new TPaveText(0.3,0.2,0.4,0.3,"");
+         TPaveText *SR6 = new TPaveText(0.3,-0.1,0.5,0.1,"");
          SR6->SetTextSize(0.02);
          SR6->SetFillColor(0);
          SR6->AddText("SR6");
-         TPaveText *SR7 = new TPaveText(0.2,-0.3,0.3,-0.2,"");
+         TPaveText *SR7 = new TPaveText(-0.6,-0.1,-0.4,0.1,"");
          SR7->SetTextSize(0.02);
          SR7->SetFillColor(0);
          SR7->AddText("SR7"); 
 
          histBDT_WWZ->SetStats(0);
-         histBDT_WWZ->Draw("SCAT");
+         histBDT_WWZ->Draw("box");
          histBDT_WWZ->GetXaxis()->SetTitle("NonResonant WWZ MVA score");
          histBDT_WWZ->GetYaxis()->SetTitle("ZH MVA score");
-	 histBDT_ZH->Draw("SCAT same");
-	 histBDT_BKG->Draw("SCAT same");
+	 histBDT_ZH->Draw("box same");
+	 histBDT_BKG->Draw("box same");
 	 legend1->Draw();
          TString h = "";
 
          if ( drawSRs ){
 	      SR1_L1->SetLineWidth(3);
+              SR1_L2->SetLineWidth(3);
               SR2_L1->SetLineWidth(3);
               SR3_L1->SetLineWidth(3);
+              SR3_L2->SetLineWidth(3);
               SR4_L1->SetLineWidth(3);
-              SR4_L2->SetLineWidth(3);
-	      SR5_L1->SetLineWidth(3); 
-	      SR6_L1->SetLineWidth(3);
+              SR5_L1->SetLineWidth(3);
+              SR6_L1->SetLineWidth(3);
 	      SR1_L1->Draw();
-	      SR2_L1->Draw();
-	      SR3_L1->Draw();
+	      SR1_L2->Draw();
+              SR2_L1->Draw();
+              SR3_L1->Draw();
+              SR3_L2->Draw();
               SR4_L1->Draw();
-              SR4_L2->Draw();
-	      SR5_L1->Draw(); 
+              SR5_L1->Draw();
               SR6_L1->Draw();
               SR1->Draw();
               SR2->Draw();
@@ -923,7 +935,7 @@ void plotHists(bool draw2Donly=false, bool makeSRs=false, bool drawSRs=false, bo
          hs_SR_bkg->Add(h_SR_other);
          hs_SR_bkg->Add(h_SR_vvv);
 
-         TLegend* legendSR = new TLegend(0.80,0.60,0.90,0.90,"","NDC");
+         TLegend* legendSR = new TLegend(0.60,0.60,0.70,0.90,"","NDC");
          legendSR->SetBorderSize(0);
          legendSR->SetTextFont(43);
          legendSR->SetTextAlign(12);

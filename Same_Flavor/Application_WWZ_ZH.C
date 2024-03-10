@@ -21,8 +21,8 @@ void Application_WWZ_ZH(){
      std::map<std::string,int> Use_WWZ;
      std::map<std::string,int> Use_ZH;
 
-     Use_WWZ["BDTG_LR0p1"]              = 1;  // Need to use the same method as utilized during the training
-     Use_ZH["BDTG_LR0p1_D2_NS1"]        = 1;
+     Use_WWZ["BDTG_LR0p1"]       = 1;  // Need to use the same method as utilized during the training
+     Use_ZH["BDTG_LR0p1"]        = 1;
 
      float m_ll;
      float m_4l;
@@ -84,16 +84,17 @@ void Application_WWZ_ZH(){
      reader_wwz->AddVariable( "MT_subleading_Wcand", &MT_subleading_Wcand );
      reader_wwz->AddVariable( "MT_Wcands", &MT_Wcands );
      reader_wwz->AddVariable( "MT_4Lep", &MT_4Lep );
-     reader_wwz->AddVariable( "leading_jet_DeepFlav", &leading_jet_DeepFlav );
+     //reader_wwz->AddVariable( "leading_jet_DeepFlav", &leading_jet_DeepFlav );
      reader_wwz->AddVariable( "min_dR_W1_jet", &min_dR_W1_jet );
      reader_wwz->AddVariable( "min_dR_W2_jet", &min_dR_W2_jet );
 
      //reader_wwz->AddSpectator( "dPhi_Zcand_MET", &dPhi_Zcand_MET );
      reader_wwz->AddSpectator( "leading_jet_pt", &leading_jet_pt );
      reader_wwz->AddSpectator( "subleading_jet_pt", &subleading_jet_pt );
+     reader_wwz->AddSpectator( "leading_jet_DeepFlav", &leading_jet_DeepFlav );
 
      TString dir_1 = "WWZ_vs_Backgrounds/dataset/weights/";
-     TString prefix_1 = "010224_newVars";
+     TString prefix_1 = "020824_newBkgd";
      for (std::map<std::string,int>::iterator it = Use_WWZ.begin(); it != Use_WWZ.end(); it++) {
          if (it->second) {
          TString methodName = TString(it->first) + TString(" method");
@@ -127,15 +128,16 @@ void Application_WWZ_ZH(){
      reader_zh->AddVariable( "MT_subleading_Wcand", &MT_subleading_Wcand );
      reader_zh->AddVariable( "MT_Wcands", &MT_Wcands );
      reader_zh->AddVariable( "MT_4Lep", &MT_4Lep );
-     reader_zh->AddVariable( "leading_jet_DeepFlav", &leading_jet_DeepFlav );
+     //reader_zh->AddVariable( "leading_jet_DeepFlav", &leading_jet_DeepFlav );
      reader_zh->AddVariable( "min_dR_W1_jet", &min_dR_W1_jet );
      reader_zh->AddVariable( "min_dR_W2_jet", &min_dR_W2_jet );
 
      reader_zh->AddSpectator( "leading_jet_pt", &leading_jet_pt );
      reader_zh->AddSpectator( "subleading_jet_pt", &subleading_jet_pt );
+     reader_zh->AddSpectator( "leading_jet_DeepFlav", &leading_jet_DeepFlav );
 
      TString dir_2 = "ZH_vs_Backgrounds/dataset/weights/";
-     TString prefix_2 = "010224_newVars";
+     TString prefix_2 = "020824_newBkgd";
      for (std::map<std::string,int>::iterator it = Use_ZH.begin(); it != Use_ZH.end(); it++) {
          if (it->second) {
          TString methodName = TString(it->first) + TString(" method");
@@ -144,8 +146,10 @@ void Application_WWZ_ZH(){
          }
      }
 
-     TString path = "/home/users/kdownham/Triboson/VVVNanoLooper/analysis/output_010124_BDTVars/Run2/";
+     TString path = "/home/users/kdownham/Triboson/VVVNanoLooper/analysis/output_020724_BDTUpdate/Run2/";
      std::vector<TString> files = {"NonResWWZ.root", "ZHWWZ.root", "TTZ.root", "ZZ.root", "tWZ.root", "WZ.root", "VVV.root", "Other.root"};
+     //TString path = "/home/users/kdownham/Triboson/VVVNanoLooper/analysis/";
+     //std::vector<TString> files = {"test_WWZJets_17_testBDT.root"};
 
      ofstream mva_scores;
      mva_scores.open("mva_scores_SF.txt");
@@ -180,7 +184,7 @@ void Application_WWZ_ZH(){
           tree->SetBranchAddress( "MT_subleading_Wcand", &MT_subleading_Wcand );
           tree->SetBranchAddress( "MT_Wcands", &MT_Wcands );
           tree->SetBranchAddress( "MT_4Lep", &MT_4Lep );
-          tree->SetBranchAddress( "leading_jet_DeepFlav", &leading_jet_DeepFlav );
+          //tree->SetBranchAddress( "leading_jet_DeepFlav", &leading_jet_DeepFlav );
           tree->SetBranchAddress( "leading_jet_pt", &leading_jet_pt );
           tree->SetBranchAddress( "min_dR_W1_jet", &min_dR_W1_jet );
           tree->SetBranchAddress( "min_dR_W2_jet", &min_dR_W2_jet );
@@ -212,7 +216,7 @@ void Application_WWZ_ZH(){
           tree1->SetBranchAddress( "MT_subleading_Wcand", &MT_subleading_Wcand );
           tree1->SetBranchAddress( "MT_Wcands", &MT_Wcands );
           tree1->SetBranchAddress( "MT_4Lep", &MT_4Lep );
-          tree1->SetBranchAddress( "leading_jet_DeepFlav", &leading_jet_DeepFlav );
+          //tree1->SetBranchAddress( "leading_jet_DeepFlav", &leading_jet_DeepFlav );
           tree1->SetBranchAddress( "min_dR_W1_jet", &min_dR_W1_jet );
           tree1->SetBranchAddress( "min_dR_W2_jet", &min_dR_W2_jet );
           tree1->SetBranchAddress( "weight", &weight);
@@ -239,7 +243,7 @@ void Application_WWZ_ZH(){
                //std::cout << "ZH score : " << reader_zh->EvaluateMVA("BDTG method") << std::endl;
 
                float mva_wwz = reader_wwz->EvaluateMVA("BDTG_LR0p1 method");
-               float mva_zh = reader_zh->EvaluateMVA("BDTG_LR0p1_D2_NS1 method");
+               float mva_zh = reader_zh->EvaluateMVA("BDTG_LR0p1 method");
 
                mva_scores << proc << " " << mva_wwz << " " << mva_zh << " " << weight << " \n";               
 
@@ -253,7 +257,7 @@ void Application_WWZ_ZH(){
                tree1->GetEntry(ievt);
 
                float mva_wwz = reader_wwz->EvaluateMVA("BDTG_LR0p1 method");
-               float mva_zh = reader_zh->EvaluateMVA("BDTG_LR0p1_D2_NS1 method");
+               float mva_zh = reader_zh->EvaluateMVA("BDTG_LR0p1 method");
 
                mva_scores << proc << " " << mva_wwz << " " << mva_zh << " " << weight << " \n";
 
